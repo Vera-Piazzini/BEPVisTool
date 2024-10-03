@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualization_2.Line_chart_PPD &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=795c39da"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">BEPVis data visualization tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Data Visualizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Visualization_2.Line_chart_PPD</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Visualization_2.Line_chart_PPD</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">**Visualization of Monthly Average PPD (Predicted Percentage od Dissatisfied) Values by Space**</span>
+
+<span class="sd">This script loads data from an Excel file, processes it using Pandas, and visualizes it with Bokeh. </span>
+<span class="sd">The resulting plot displays PPD values across different zones, categorized by month. </span>
+<span class="sd">The plot includes annotations for comfort zones based on PPD values and a legend to identify each zone.</span>
+
+<span class="sd">PPD is a measure of thermal comfort that predicts the percentage of occupants likely to be dissatisfied with the thermal environment. </span>
+<span class="sd">This visualization helps in assessing and comparing the comfort levels across different spaces over time.</span>
+
+<span class="sd">Modules:</span>
+<span class="sd">    - pandas: Used for data manipulation and analysis.</span>
+<span class="sd">    - bokeh.models: Used for creating interactive Bokeh plots.</span>
+<span class="sd">    - bokeh.plotting: Provides high-level plotting functions for Bokeh.</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">    - **load_data(file_path: str) -&gt; pd.DataFrame:** Loads data from the specified Excel file and returns it as a DataFrame.</span>
+<span class="sd">    - **prepare_data(df: pd.DataFrame) -&gt; dict:** Converts the DataFrame into a ColumnDataSource dictionary for Bokeh.</span>
+<span class="sd">    - **create_plot(data_sources: dict) -&gt; figure:** Creates the Bokeh plot with lines for each zone, annotations, and legends.</span>
+<span class="sd">    - **add_annotations_and_legends(plot: figure) -&gt; None:** Adds box annotations and legends to the Bokeh plot.</span>
+<span class="sd">    - **show_plot(plot: figure) -&gt; None:** Displays the final Bokeh plot.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">BoxAnnotation</span><span class="p">,</span> <span class="n">HoverTool</span><span class="p">,</span> <span class="n">Legend</span><span class="p">,</span> <span class="n">LegendItem</span><span class="p">,</span> <span class="n">Span</span><span class="p">,</span> <span class="n">ColumnDataSource</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">figure</span><span class="p">,</span> <span class="n">show</span>
+
+<div class="viewcode-block" id="load_data">
+<a class="viewcode-back" href="../../Visualization_2.html#Visualization_2.Line_chart_PPD.load_data">[docs]</a>
+<span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads data from the specified Excel file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (str): Path to the Excel file containing the data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame: DataFrame containing the loaded data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;PPD Data&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="prepare_data">
+<a class="viewcode-back" href="../../Visualization_2.html#Visualization_2.Line_chart_PPD.prepare_data">[docs]</a>
+<span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts the DataFrame into a ColumnDataSource dictionary for Bokeh.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pd.DataFrame): DataFrame containing the PPD data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of ColumnDataSource objects for each zone.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sources</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
+        <span class="n">sources</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;zone</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+            <span class="n">months</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Month&#39;</span><span class="p">],</span>
+            <span class="n">zone_avg</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Zone</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">],</span>
+            <span class="n">zone_max</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Zone</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">max&#39;</span><span class="p">],</span>
+            <span class="n">zone_min</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Zone</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">min&#39;</span><span class="p">],</span>
+        <span class="p">))</span>
+    <span class="k">return</span> <span class="n">sources</span></div>
+
+
+<div class="viewcode-block" id="create_plot">
+<a class="viewcode-back" href="../../Visualization_2.html#Visualization_2.Line_chart_PPD.create_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">create_plot</span><span class="p">(</span><span class="n">data_sources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates the Bokeh plot with lines for each zone.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data_sources (dict): Dictionary of ColumnDataSource objects.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        figure: Bokeh figure with the plotted data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">x_range</span><span class="o">=</span><span class="n">data_sources</span><span class="p">[</span><span class="s1">&#39;zone1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;months&#39;</span><span class="p">],</span> <span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">35</span><span class="p">),</span> <span class="n">height</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> 
+               <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Monthly average PPD values by space&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;pan,wheel_zoom,reset,box_select,box_zoom,lasso_select&quot;</span><span class="p">)</span>
+    
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;#374649&#39;</span><span class="p">,</span> <span class="s1">&#39;#01B8AA&#39;</span><span class="p">,</span> <span class="s1">&#39;#FD625E&#39;</span><span class="p">,</span> <span class="s1">&#39;#F2C80C&#39;</span><span class="p">,</span> <span class="s1">&#39;#A865B5&#39;</span><span class="p">]</span>
+    <span class="n">renderers</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;months&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;zone_avg&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">data_sources</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;zone</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;months&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;zone_max&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">data_sources</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;zone</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;months&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;zone_min&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">data_sources</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;zone</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">renderers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">p</span><span class="p">,</span> <span class="n">renderers</span></div>
+
+
+<div class="viewcode-block" id="add_annotations_and_legends">
+<a class="viewcode-back" href="../../Visualization_2.html#Visualization_2.Line_chart_PPD.add_annotations_and_legends">[docs]</a>
+<span class="k">def</span> <span class="nf">add_annotations_and_legends</span><span class="p">(</span><span class="n">plot</span><span class="p">:</span> <span class="n">figure</span><span class="p">,</span> <span class="n">renderers</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds box annotations and legends to the Bokeh plot.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        plot (figure): Bokeh figure to add annotations and legends to.</span>
+<span class="sd">        renderers (list): List of line renderers for each zone.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Add comfort and out-of-range annotations</span>
+    <span class="n">comfort_box</span> <span class="o">=</span> <span class="n">BoxAnnotation</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">35</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="s2">&quot;#F2DADA&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;underlay&quot;</span><span class="p">)</span>
+    <span class="n">out_of_range_box</span> <span class="o">=</span> <span class="n">BoxAnnotation</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="s2">&quot;#F8FAF3&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;underlay&quot;</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">comfort_box</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">out_of_range_box</span><span class="p">)</span>
+
+    <span class="c1"># Add hover tools for each zone</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">renderers</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span><span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Space&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Month&quot;</span><span class="p">,</span> <span class="s2">&quot;@months&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;PPD Avg&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;@zone_avg</span><span class="se">{{</span><span class="s2">0.00</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">)])</span>
+        <span class="n">plot</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
+
+    <span class="c1"># Create and add legends</span>
+    <span class="n">zone_legend</span> <span class="o">=</span> <span class="n">Legend</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="n">LegendItem</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Space </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">renderers</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
+                         <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;top_center&quot;</span><span class="p">)</span>
+
+    <span class="n">comfort_legend</span> <span class="o">=</span> <span class="n">Legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;PPD ranges&quot;</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="p">[</span>
+                            <span class="n">LegendItem</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Comfort range (20</span><span class="si">%-35%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">plot</span><span class="o">.</span><span class="n">square</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fill_color</span><span class="o">=</span><span class="s2">&quot;#F2DADA&quot;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">)]),</span>
+                            <span class="n">LegendItem</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Out of range (0</span><span class="si">%-20%</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">plot</span><span class="o">.</span><span class="n">square</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fill_color</span><span class="o">=</span><span class="s2">&quot;#F8FAF3&quot;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">)])],</span>
+                            <span class="n">location</span><span class="o">=</span><span class="s2">&quot;center_right&quot;</span><span class="p">)</span>
+
+    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">zone_legend</span><span class="p">,</span> <span class="s1">&#39;above&#39;</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">comfort_legend</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">click_policy</span> <span class="o">=</span> <span class="s2">&quot;mute&quot;</span>
+
+    <span class="c1"># Add span lines for ISO 7730 guidelines</span>
+    <span class="n">span1</span> <span class="o">=</span> <span class="n">Span</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">line_dash</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">span1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="show_plot">
+<a class="viewcode-back" href="../../Visualization_2.html#Visualization_2.Line_chart_PPD.show_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">show_plot</span><span class="p">(</span><span class="n">plot</span><span class="p">:</span> <span class="n">figure</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Displays the final Bokeh plot.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        plot (figure): Bokeh figure to be displayed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">show</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
