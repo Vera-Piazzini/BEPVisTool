@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualization_5.Scatter_plot_Heating &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=795c39da"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">BEPVis data visualization tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Data Visualizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Visualization_5.Scatter_plot_Heating</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Visualization_5.Scatter_plot_Heating</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">**Visualization of the Relationship between Outdoor Air Temperature and the Total Heating Rate**</span>
+
+<span class="sd">This script generates a scatter plot to visualize the relationship between outdoor air temperature </span>
+<span class="sd">and the total heating rate for a specific space, using data from an Excel file. The data is divided </span>
+<span class="sd">into different time ranges, and for each range, a linear trend line is calculated and plotted.</span>
+
+<span class="sd">The script uses the Bokeh library to create interactive visualizations, allowing users to explore </span>
+<span class="sd">the data with various tools like zooming, panning, and tooltips.</span>
+
+<span class="sd">The plot includes:</span>
+<span class="sd">- Scatter points colored based on 8-hour time ranges.</span>
+<span class="sd">- A general trend line for the entire dataset.</span>
+<span class="sd">- Individual trend lines for each time range.</span>
+<span class="sd">- Interactive legends and tooltips.</span>
+
+<span class="sd">Modules:</span>
+<span class="sd">    - pandas: Used for data manipulation and analysis.</span>
+<span class="sd">    - bokeh.plotting: Provides high-level plotting functions for Bokeh.</span>
+<span class="sd">    - bokeh.io: Handles output operations for Bokeh visualizations.</span>
+<span class="sd">    - bokeh.models: Used for customizing Bokeh plots (e.g., legends, hover tools).</span>
+<span class="sd">    - scipy.stats: Provides statistical functions including linear regression.</span>
+<span class="sd">    - itertools: Used for iterating over elements, specifically for cycling through colors.</span>
+<span class="sd">    - numpy: Used for numerical operations and handling arrays.</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">    - **load_data(file_path: str) -&gt; pd.DataFrame:** Loads data from the specified Excel file and returns it as a DataFrame.</span>
+<span class="sd">    - **extract_time_ranges(df: pd.DataFrame) -&gt; pd.DataFrame:** Extracts and adds the &#39;Hour&#39; column to the DataFrame for categorizing data into time ranges.</span>
+<span class="sd">    - **create_scatter_plot(df: pd.DataFrame) -&gt; figure:** Creates a Bokeh scatter plot with scatter points and trend lines based on time ranges.</span>
+<span class="sd">    - **add_trend_lines(p: figure, x: pd.Series, y: pd.Series, df: pd.DataFrame) -&gt; None:** Adds a general trend line and individual trend lines for each time range.</span>
+<span class="sd">    - **configure_plot(p: figure) -&gt; None:** Configures the plot with labels, legends, and tooltips.</span>
+<span class="sd">    - **save_and_show_plot(p: figure, output_filename: str) -&gt; None:** Saves the plot to an HTML file and displays it in a browser.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">figure</span><span class="p">,</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">output_file</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">linregress</span>
+<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">viridis</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">HoverTool</span><span class="p">,</span> <span class="n">Legend</span>
+
+<div class="viewcode-block" id="load_data">
+<a class="viewcode-back" href="../../Visualization_5.html#Visualization_5.Scatter_plot_Heating.load_data">[docs]</a>
+<span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads data from the specified Excel file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (str): Path to the Excel file containing the data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame: DataFrame containing the loaded data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="extract_time_ranges">
+<a class="viewcode-back" href="../../Visualization_5.html#Visualization_5.Scatter_plot_Heating.extract_time_ranges">[docs]</a>
+<span class="k">def</span> <span class="nf">extract_time_ranges</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts and adds the &#39;Hour&#39; column to the DataFrame for categorizing data into time ranges.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pd.DataFrame): DataFrame containing the date/time data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame: Updated DataFrame with an additional &#39;Hour&#39; column.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Date/Time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">()</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="create_scatter_plot">
+<a class="viewcode-back" href="../../Visualization_5.html#Visualization_5.Scatter_plot_Heating.create_scatter_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">create_scatter_plot</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a Bokeh scatter plot with scatter points and trend lines based on time ranges.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pd.DataFrame): DataFrame containing the outdoor temperature and heating rate data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        figure: Bokeh figure with scatter points and trend lines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Extract relevant columns</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;SPACE1-1:Zone Outdoor Air Drybulb Temperature [C](Hourly)&#39;</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;ZONE 1 IDEAL LOADS:Zone Ideal Loads Zone Total Heating Rate [W](Hourly)&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Create the scatter plot figure</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Total Heating Rate (W) vs Outdoor Temperature (°C) - Space 1&quot;</span><span class="p">,</span>
+               <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,examine,help&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">p</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="add_trend_lines">
+<a class="viewcode-back" href="../../Visualization_5.html#Visualization_5.Scatter_plot_Heating.add_trend_lines">[docs]</a>
+<span class="k">def</span> <span class="nf">add_trend_lines</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">figure</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a general trend line and individual trend lines for each time range.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        p (figure): Bokeh figure to add trend lines to.</span>
+<span class="sd">        x (pd.Series): Series of outdoor temperature values.</span>
+<span class="sd">        y (pd.Series): Series of total heating rate values.</span>
+<span class="sd">        df (pd.DataFrame): DataFrame with the &#39;Hour&#39; column for time range categorization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># General trend line for all data points</span>
+    <span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">linregress</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">general_trend_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)])</span>
+    <span class="n">general_trend_y</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">general_trend_x</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">general_trend_x</span><span class="p">,</span> <span class="n">general_trend_y</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="s2">&quot;General Trend Line&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Define the number of 8-hour ranges and corresponding colors</span>
+    <span class="n">num_ranges</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="n">viridis</span><span class="p">(</span><span class="n">num_ranges</span><span class="p">))</span>
+
+    <span class="c1"># Add scatter points and trend lines for each 8-hour range</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hour_range</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">19</span><span class="p">),</span> <span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">24</span><span class="p">)]):</span>
+        <span class="n">x_range</span> <span class="o">=</span> <span class="n">x</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">y_range</span> <span class="o">=</span> <span class="n">y</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> hours&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_range</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">linregress</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span><span class="p">)</span>
+            <span class="n">trend_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">x_range</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x_range</span><span class="p">)])</span>
+            <span class="n">trend_y</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">trend_x</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">trend_x</span><span class="p">,</span> <span class="n">trend_y</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Trend Line </span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> hours&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="configure_plot">
+<a class="viewcode-back" href="../../Visualization_5.html#Visualization_5.Scatter_plot_Heating.configure_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">configure_plot</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">figure</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configures the plot with labels, legends, and tooltips.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        p (figure): Bokeh figure to configure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Set axis labels</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Hourly Outdoor Temperature [°C]&#39;</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Hourly Total Heating Rate [W]&#39;</span>
+
+    <span class="c1"># Set y-axis range to start at 0</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Customize the legend</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Hour Range&quot;</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;top_right&quot;</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">click_policy</span> <span class="o">=</span> <span class="s2">&quot;hide&quot;</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;9pt&quot;</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">spacing</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># Customize the tooltip for hover tool</span>
+    <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span><span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Outdoor Temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;@x</span><span class="si">{0.0}</span><span class="s2"> °C&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Heating Rate&quot;</span><span class="p">,</span> <span class="s2">&quot;@y</span><span class="si">{0}</span><span class="s2"> W&quot;</span><span class="p">)])</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_and_show_plot">
+<a class="viewcode-back" href="../../Visualization_5.html#Visualization_5.Scatter_plot_Heating.save_and_show_plot">[docs]</a>
+<span class="k">def</span> <span class="nf">save_and_show_plot</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">figure</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Saves the plot to an HTML file and displays it in a browser.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        p (figure): Bokeh figure to be saved and displayed.</span>
+<span class="sd">        output_filename (str): The filename for the HTML output.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">output_file</span><span class="p">(</span><span class="n">output_filename</span><span class="p">)</span>
+    <span class="n">show</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bar chart code &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=795c39da"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Line chart code" href="Visualization_2.html" />
+    <link rel="prev" title="Data Visualizations" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">BEPVis data visualization tool</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Data Visualizations</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Bar chart code</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#building-s-energy-balance">Building’s Energy Balance</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_1.Bar_chart.calculate_annual_sums"><code class="docutils literal notranslate"><span class="pre">calculate_annual_sums()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_1.Bar_chart.configure_figure"><code class="docutils literal notranslate"><span class="pre">configure_figure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_1.Bar_chart.create_figure"><code class="docutils literal notranslate"><span class="pre">create_figure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_1.Bar_chart.load_excel_data"><code class="docutils literal notranslate"><span class="pre">load_excel_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_1.Bar_chart.plot_stacked_bars"><code class="docutils literal notranslate"><span class="pre">plot_stacked_bars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_1.Bar_chart.prepare_data_for_visualization"><code class="docutils literal notranslate"><span class="pre">prepare_data_for_visualization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_1.Bar_chart.visualize_energy_balance"><code class="docutils literal notranslate"><span class="pre">visualize_energy_balance()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Visualization_1">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Visualization_2.html">Line chart code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Visualization_3.html">Heatmap code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Visualization_4.html">Radar chart code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Visualization_5.html">Scatter plot code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Data Visualizations</a></li>
+      <li class="breadcrumb-item active">Bar chart code</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Visualization_1.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="bar-chart-code">
+<h1>Bar chart code<a class="headerlink" href="#bar-chart-code" title="Link to this heading"></a></h1>
+<section id="building-s-energy-balance">
+<h2>Building’s Energy Balance<a class="headerlink" href="#building-s-energy-balance" title="Link to this heading"></a></h2>
+<img alt="Bar chart visualization" class="align-center" src="_images/1.Bar.jpg" />
+<p id="module-Visualization_1.Bar_chart"><strong>Visualization of Annual and Monthly Energy Balance of a Building</strong></p>
+<p>This module provides functionality to visualize the energy balance of a building
+over a year using stacked bar charts. The data is loaded from an Excel file,
+processed, and then visualized using Bokeh.</p>
+<dl class="simple">
+<dt>Functions:</dt><dd><ul class="simple">
+<li><p><strong>load_excel_data(file_path: str, sheet_name: str) -&gt; pd.DataFrame:</strong> Loads data from an Excel sheet into a DataFrame.</p></li>
+<li><p><strong>calculate_annual_sums(df_gains: pd.DataFrame, df_losses: pd.DataFrame) -&gt; tuple:</strong> Calculates the annual sums of gains and losses from the data.</p></li>
+<li><p><strong>prepare_data_for_visualization(df_gains: pd.DataFrame, df_losses: pd.DataFrame) -&gt; tuple:</strong> Prepares data for total annual and monthly balance visualization.</p></li>
+<li><p><strong>create_figure(title: str, x_range, y_range, x_label: str, y_label: str) -&gt; figure:</strong> Creates a Bokeh figure for plotting.</p></li>
+<li><p><strong>plot_stacked_bars(p: figure, types: list, source_data: dict, reverse_palette: list, losses: bool = False) -&gt; None:</strong> Plots stacked bars for the given figure.</p></li>
+<li><p><strong>configure_figure(p: figure, title: str, x_label: str, y_label: str) -&gt; None:</strong> Configures the appearance of the Bokeh figure.</p></li>
+<li><p><strong>visualize_energy_balance(df_gains: pd.DataFrame, df_losses: pd.DataFrame) -&gt; None:</strong> Visualizes the energy balance using Bokeh.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_1.Bar_chart.calculate_annual_sums">
+<span class="sig-prename descclassname"><span class="pre">Visualization_1.Bar_chart.</span></span><span class="sig-name descname"><span class="pre">calculate_annual_sums</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_gains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_losses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="_modules/Visualization_1/Bar_chart.html#calculate_annual_sums"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_1.Bar_chart.calculate_annual_sums" title="Link to this definition"></a></dt>
+<dd><p>Calculates the annual sums of gains and losses from the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_gains</strong> (<em>pd.DataFrame</em>) – DataFrame containing energy gains data.</p></li>
+<li><p><strong>df_losses</strong> (<em>pd.DataFrame</em>) – DataFrame containing energy losses data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annual gains and losses as lists.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_1.Bar_chart.configure_figure">
+<span class="sig-prename descclassname"><span class="pre">Visualization_1.Bar_chart.</span></span><span class="sig-name descname"><span class="pre">configure_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/Visualization_1/Bar_chart.html#configure_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_1.Bar_chart.configure_figure" title="Link to this definition"></a></dt>
+<dd><p>Configures the appearance of the Bokeh figure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<em>figure</em>) – The Bokeh figure to configure.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title of the figure.</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>) – The label for the x-axis.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em>) – The label for the y-axis.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_1.Bar_chart.create_figure">
+<span class="sig-prename descclassname"><span class="pre">Visualization_1.Bar_chart.</span></span><span class="sig-name descname"><span class="pre">create_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">figure</span></span></span><a class="reference internal" href="_modules/Visualization_1/Bar_chart.html#create_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_1.Bar_chart.create_figure" title="Link to this definition"></a></dt>
+<dd><p>Creates a Bokeh figure for plotting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) – The title of the figure.</p></li>
+<li><p><strong>x_range</strong> (<em>list</em><em> or </em><em>str</em>) – The range of the x-axis.</p></li>
+<li><p><strong>y_range</strong> (<em>tuple</em>) – The range of the y-axis.</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>) – The label for the x-axis.</p></li>
+<li><p><strong>y_label</strong> (<em>str</em>) – The label for the y-axis.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The created Bokeh figure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_1.Bar_chart.load_excel_data">
+<span class="sig-prename descclassname"><span class="pre">Visualization_1.Bar_chart.</span></span><span class="sig-name descname"><span class="pre">load_excel_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/Visualization_1/Bar_chart.html#load_excel_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_1.Bar_chart.load_excel_data" title="Link to this definition"></a></dt>
+<dd><p>Loads data from an Excel sheet into a DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – The path to the Excel file.</p></li>
+<li><p><strong>sheet_name</strong> (<em>str</em>) – The sheet name to load data from.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The loaded data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_1.Bar_chart.plot_stacked_bars">
+<span class="sig-prename descclassname"><span class="pre">Visualization_1.Bar_chart.</span></span><span class="sig-name descname"><span class="pre">plot_stacked_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">figure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse_palette</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">losses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/Visualization_1/Bar_chart.html#plot_stacked_bars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_1.Bar_chart.plot_stacked_bars" title="Link to this definition"></a></dt>
+<dd><p>Plots stacked bars for the given figure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<em>figure</em>) – The Bokeh figure to plot on.</p></li>
+<li><p><strong>types</strong> (<em>list</em>) – The list of energy types.</p></li>
+<li><p><strong>source_data</strong> (<em>dict</em>) – The data source for the plot.</p></li>
+<li><p><strong>reverse_palette</strong> (<em>list</em>) – The color palette to use.</p></li>
+<li><p><strong>losses</strong> (<em>bool</em>) – If True, plots losses; otherwise, plots gains. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_1.Bar_chart.prepare_data_for_visualization">
+<span class="sig-prename descclassname"><span class="pre">Visualization_1.Bar_chart.</span></span><span class="sig-name descname"><span class="pre">prepare_data_for_visualization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_gains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_losses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="_modules/Visualization_1/Bar_chart.html#prepare_data_for_visualization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_1.Bar_chart.prepare_data_for_visualization" title="Link to this definition"></a></dt>
+<dd><p>Prepares data for total annual and monthly balance visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_gains</strong> (<em>pd.DataFrame</em>) – DataFrame containing energy gains data.</p></li>
+<li><p><strong>df_losses</strong> (<em>pd.DataFrame</em>) – DataFrame containing energy losses data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Two dictionaries containing data for the total annual and monthly balance graphs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_1.Bar_chart.visualize_energy_balance">
+<span class="sig-prename descclassname"><span class="pre">Visualization_1.Bar_chart.</span></span><span class="sig-name descname"><span class="pre">visualize_energy_balance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_gains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_losses</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/Visualization_1/Bar_chart.html#visualize_energy_balance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_1.Bar_chart.visualize_energy_balance" title="Link to this definition"></a></dt>
+<dd><p>Visualizes the energy balance using Bokeh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_gains</strong> (<em>pd.DataFrame</em>) – DataFrame containing energy gains data.</p></li>
+<li><p><strong>df_losses</strong> (<em>pd.DataFrame</em>) – DataFrame containing energy losses data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-Visualization_1">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-Visualization_1" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="Data Visualizations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Visualization_2.html" class="btn btn-neutral float-right" title="Line chart code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

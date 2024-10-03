@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Radar chart code &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=795c39da"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Scatter plot code" href="Visualization_5.html" />
+    <link rel="prev" title="Heatmap code" href="Visualization_3.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">BEPVis data visualization tool</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Data Visualizations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Visualization_1.html">Bar chart code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Visualization_2.html">Line chart code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Visualization_3.html">Heatmap code</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Radar chart code</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#building-energy-consumption">Building Energy Consumption</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_4.Radar.create_figures"><code class="docutils literal notranslate"><span class="pre">create_figures()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_4.Radar.load_data"><code class="docutils literal notranslate"><span class="pre">load_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_4.Radar.prepare_radar_data"><code class="docutils literal notranslate"><span class="pre">prepare_radar_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualization_4.Radar.show_figures"><code class="docutils literal notranslate"><span class="pre">show_figures()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Visualization_4">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Visualization_5.html">Scatter plot code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Data Visualizations</a></li>
+      <li class="breadcrumb-item active">Radar chart code</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Visualization_4.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="radar-chart-code">
+<h1>Radar chart code<a class="headerlink" href="#radar-chart-code" title="Link to this heading"></a></h1>
+<section id="building-energy-consumption">
+<h2>Building Energy Consumption<a class="headerlink" href="#building-energy-consumption" title="Link to this heading"></a></h2>
+<img alt="Radar chart visualization" class="align-center" src="_images/4.Radar.jpg" />
+<p id="module-Visualization_4.Radar"><strong>Visualization of Building Primary Energy Consumption by Space and Type</strong></p>
+<p>This script generates a visual representation of building primary energy consumption
+by space and type using radar charts and bar charts. The data is read from multiple
+sheets of an Excel file, each representing a different space. Radar charts are used
+to compare different categories of energy consumption within each space, while bar
+charts visualize the total consumption for each category.</p>
+<p>The script uses the Plotly library for creating interactive plots, and the data is
+fetched from an Excel file specified by the user.</p>
+<p>Categories of energy consumption:
+- Cooling
+- Heating
+- Ventilation
+- Lighting
+- Equipment
+- Water Heating</p>
+<p>Each space is represented by a separate radar chart and a corresponding bar chart.</p>
+<dl class="simple">
+<dt>Modules:</dt><dd><ul class="simple">
+<li><p>pandas: Used for data manipulation and analysis.</p></li>
+<li><p>plotly.graph_objects: Used for creating radar and bar charts.</p></li>
+<li><p>plotly.subplots: Used for creating subplots with multiple charts.</p></li>
+</ul>
+</dd>
+<dt>Functions:</dt><dd><ul class="simple">
+<li><p><strong>load_data(file_path: str, sheet_names: list) -&gt; dict:</strong> Loads data from the specified Excel file sheets and returns it as a dictionary of DataFrames.</p></li>
+<li><p><strong>prepare_radar_data(df: pd.DataFrame, categories: list) -&gt; list:</strong> Prepares radar chart data from a DataFrame for a given set of categories.</p></li>
+<li><p><strong>create_figures(spaces_data: dict, categories: list) -&gt; go.Figure:</strong> Creates a Plotly figure with radar and bar charts for each space.</p></li>
+<li><p><strong>show_figures(fig: go.Figure) -&gt; None:</strong> Displays the final Plotly figure with all charts.</p></li>
+</ul>
+</dd>
+<dt>Usage:</dt><dd><p>To use this script, provide the path to your Excel file and ensure that the sheet names correspond to the spaces you want to visualize. The script will generate and display an interactive Plotly figure with radar and bar charts.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_4.Radar.create_figures">
+<span class="sig-prename descclassname"><span class="pre">Visualization_4.Radar.</span></span><span class="sig-name descname"><span class="pre">create_figures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spaces_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Figure</span></span></span><a class="reference internal" href="_modules/Visualization_4/Radar.html#create_figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_4.Radar.create_figures" title="Link to this definition"></a></dt>
+<dd><p>Creates a Plotly figure with radar and bar charts for each space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spaces_data</strong> (<em>dict</em>) – Dictionary containing processed data for each space.</p></li>
+<li><p><strong>categories</strong> (<em>list</em>) – List of categories for the radar and bar charts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Plotly figure object with the generated charts.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>go.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_4.Radar.load_data">
+<span class="sig-prename descclassname"><span class="pre">Visualization_4.Radar.</span></span><span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sheet_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/Visualization_4/Radar.html#load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_4.Radar.load_data" title="Link to this definition"></a></dt>
+<dd><p>Loads data from the specified Excel file sheets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – Path to the Excel file containing the data.</p></li>
+<li><p><strong>sheet_names</strong> (<em>list</em>) – List of sheet names to be loaded from the Excel file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary where keys are sheet names and values are DataFrames.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_4.Radar.prepare_radar_data">
+<span class="sig-prename descclassname"><span class="pre">Visualization_4.Radar.</span></span><span class="sig-name descname"><span class="pre">prepare_radar_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/Visualization_4/Radar.html#prepare_radar_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_4.Radar.prepare_radar_data" title="Link to this definition"></a></dt>
+<dd><p>Prepares radar chart data from a DataFrame for a given set of categories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – DataFrame containing the energy consumption data.</p></li>
+<li><p><strong>categories</strong> (<em>list</em>) – List of categories for the radar chart.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of dictionaries with radar chart data for each product/system.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualization_4.Radar.show_figures">
+<span class="sig-prename descclassname"><span class="pre">Visualization_4.Radar.</span></span><span class="sig-name descname"><span class="pre">show_figures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Figure</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/Visualization_4/Radar.html#show_figures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualization_4.Radar.show_figures" title="Link to this definition"></a></dt>
+<dd><p>Displays the final Plotly figure with all charts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fig</strong> (<em>go.Figure</em>) – Plotly figure object to be displayed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-Visualization_4">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-Visualization_4" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Visualization_3.html" class="btn btn-neutral float-left" title="Heatmap code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Visualization_5.html" class="btn btn-neutral float-right" title="Scatter plot code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
