@@ -6,7 +6,7 @@
 About the authors
 ===================
 
-**Ofelia Vera-Piazzini** is a *Ph.D. candidate* at **Università Iuav di Venezia** with a rich academic background spanning across Peru, Italy, and Spain. Holding degrees from Universidad Ricardo Palma and Politecnico di Milano, along with postgraduate studies in Bioclimatic Architecture and Building Energy Simulation, her expertise lies in enhancing *building energy efficiency* through innovative design, materials and smart control systems. Passionate about integrating *new technologies*, her research focuses on *advanced calculation tools*, *simulation*, *monitoring*, and *data visualization* to optimize building performance.
+**Ofelia Vera-Piazzini** is a *Researcher* at **Università Iuav di Venezia** with a rich academic background spanning across Peru, Italy, and Spain. Holding degrees from Universidad Ricardo Palma, Politecnico di Milano, and Università Iuav di Venezia, along with postgraduate studies in Bioclimatic Architecture and Building Energy Simulation, her expertise lies in enhancing *building energy efficiency* through innovative design, materials and smart control systems. Passionate about integrating *new technologies*, her research focuses on *advanced calculation tools*, *simulation*, *monitoring*, and *data visualization* to optimize building performance.
 
 E-mail address: ofelia.verapiazzini@iuav.it
 
