@@ -15,7 +15,7 @@ To evaluate the effectiveness of graphical representations of typical building p
 
 The visualization tool was meticulously developed to ensure clarity, simplicity, and effectiveness. Guided by principles such as ease of comprehension, dimensional simplicity, and excellence in presentation, the goal was to seamlessly blend aesthetics with functionality [`3 <http://dx.doi.org/10.1177/1473871614550537>`_][`4 <https://www.sciencedirect.com/science/article/abs/pii/S2210670715000499>`_]. With a strong focus on intuitive user interaction and web-based accessibility, special care was taken to ensure objective representation, promoting an unbiased interpretation of the criteria [`5 <https://onlinelibrary.wiley.com/doi/10.1111/cgf.13990>`_][`6 <https://dl.acm.org/doi/10.5555/2385879>`_][`7 <https://dl.acm.org/doi/10.5555/1206491>`_]. The aim was to deliver a visually compelling and intuitive tool that empowers users to explore and interpret data with confidence and ease. The visualizations were created using Python in Visual Studio Code, incorporating the Bokeh and Plotly libraries.
 
-This work is part of a doctoral study conducted at `Iuav University of Venice <https://www-archive.iuav.it/INTERNATIO/COURSES/phd-degree/DOCTORATE-/NEW-TECHNO/index.htm>`_ and is intended to serve as an initial visualization library, which will be further improved and expanded. 
+This work is part of a doctoral study conducted at `Iuav University of Venice <https://www-archive.iuav.it/homepage/index.htm>`_ and is intended to serve as an initial visualization library, which will be further improved and expanded. 
 
 
 Developed Visualizations
@@ -24,12 +24,20 @@ Developed Visualizations
 **Stacked Bar Chart**
 ---------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\1.Bar.jpg
-  :alt: Bar chart visualization
+.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\1.StackedBar.jpg
+  :alt: Stacked Bar chart visualization
   :align: center
 
 This visualization leverages the stacking of information to display the dynamics of the building’s energy balance (kWh), distinguishing between various energy types. The approach involves creating two charts side by side—one for annual data and another for monthly data—to facilitate the understanding of temporal variations. A single legend ensures consistency in the color scale for each type of consumption, simplifying the interpretation of results. The purpose of this chart is to present both the annual and monthly energy balance, highlighting energy gains and losses. The selected parameters include heating, solar radiation, lighting, electrical equipment, occupancy (people), window transmittance, air infiltration, opaque surface conduction, natural ventilation, mechanical ventilation, and cooling. For enhanced comparability and interpretation, all data were converted into kWh.
 
+**Bar Chart**
+---------------------
+
+.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\1.Bar.jpg
+  :alt: Bar chart visualization
+  :align: center
+
+This visualization presents the distribution of the building’s annual energy balance (kWh/m²) by energy type and space, allowing a comparative analysis across zones. Each bar represents a specific energy component—both gains and losses—computed for individual rooms or thermal zones. The stacked format facilitates the identification of which physical processes (e.g., conduction, ventilation, or internal gains) contribute most significantly to the overall energy exchange in each zone. The color scale, consistent with the previous figure, ensures coherence between visualizations and enables immediate recognition of energy categories. This representation supports the evaluation of spatial patterns in energy behavior and helps identify areas with higher thermal loads or inefficiencies.
 
 **Line Chart**
 --------------
@@ -44,7 +52,7 @@ The straightforward design of the line chart facilitates data comparison and cle
 **Heatmap**
 -----------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\3.Heatmap_2.jpg
+.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\3.Heatmap.jpg
   :alt: Heatmap visualization
   :align: center
 
