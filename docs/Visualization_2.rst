@@ -4,7 +4,7 @@ Line chart code
 Predicted Mean Vote (PMV) index
 --------------------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\2.Line_PMV.jpg
+.. image:: _static\\images\\2.Line_PMV.jpg
   :alt: Line chart visualization
   :align: center
 
@@ -16,7 +16,7 @@ Predicted Mean Vote (PMV) index
 Predicted Percentage Dissatisfied (PPD) index
 ---------------------------------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\2.Line_PPD.jpg
+.. image:: _static\\images\\2.Line_PPD.jpg
   :alt: Line chart visualization
   :align: center
 

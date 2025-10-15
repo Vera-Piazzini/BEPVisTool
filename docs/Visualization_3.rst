@@ -4,7 +4,7 @@ Heatmap code
 Building Indoor Temperature
 ----------------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\3.Heatmap_2.jpg
+.. image:: _static\\images\\3.Heatmap.jpg
   :alt: Heatmap visualization
   :align: center
 

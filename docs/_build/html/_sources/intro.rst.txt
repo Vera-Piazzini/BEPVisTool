@@ -24,7 +24,7 @@ Developed Visualizations
 **Stacked Bar Chart**
 ---------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\1.StackedBar.jpg
+.. image:: _static\\images\\1.StackedBar.jpg
   :alt: Stacked Bar chart visualization
   :align: center
 
@@ -33,7 +33,7 @@ This visualization leverages the stacking of information to display the dynamics
 **Bar Chart**
 ---------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\1.Bar.jpg
+.. image:: _static\\images\\1.Bar.jpg
   :alt: Bar chart visualization
   :align: center
 
@@ -42,7 +42,7 @@ This visualization presents the distribution of the building’s annual energy b
 **Line Chart**
 --------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\2.Line_PMV.jpg
+.. image:: _static\\images\\2.Line_PMV.jpg
   :alt: Line chart visualization
   :align: center
 
@@ -52,7 +52,7 @@ The straightforward design of the line chart facilitates data comparison and cle
 **Heatmap**
 -----------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\3.Heatmap.jpg
+.. image:: _static\\images\\3.Heatmap.jpg
   :alt: Heatmap visualization
   :align: center
 
@@ -62,7 +62,7 @@ Based on Levitt's proposal [8], this visualization uses color coding to represen
 **Radar Chart** 
 ---------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\4.Radar.jpg
+.. image:: _static\\images\\4.Radar.jpg
   :alt: Radar chart visualization
   :align: center
 
@@ -72,7 +72,7 @@ This visualization depicts the building’s energy consumption (kWh) by type acr
 **Scatter Plot**
 ----------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\5.Scatter.jpg
+.. image:: _static\\images\\5.Scatter.jpg
   :alt: Scatter plot visualization
   :align: center
   

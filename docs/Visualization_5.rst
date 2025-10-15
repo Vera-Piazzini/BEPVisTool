@@ -4,7 +4,7 @@ Scatter plot code
 Cooling Rate and Outdoor Temperature
 ------------------------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\5.Scatter.jpg
+.. image:: _static\\images\\5.Scatter.jpg
   :alt: Scatter plot visualization
   :align: center
 

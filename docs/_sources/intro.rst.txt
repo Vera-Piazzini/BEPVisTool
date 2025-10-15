@@ -24,12 +24,20 @@ Developed Visualizations
 **Stacked Bar Chart**
 ---------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\1.Bar.jpg
-  :alt: Bar chart visualization
+.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\1.StackedBar.jpg
+  :alt: Stacked Bar chart visualization
   :align: center
 
 This visualization leverages the stacking of information to display the dynamics of the building’s energy balance (kWh), distinguishing between various energy types. The approach involves creating two charts side by side—one for annual data and another for monthly data—to facilitate the understanding of temporal variations. A single legend ensures consistency in the color scale for each type of consumption, simplifying the interpretation of results. The purpose of this chart is to present both the annual and monthly energy balance, highlighting energy gains and losses. The selected parameters include heating, solar radiation, lighting, electrical equipment, occupancy (people), window transmittance, air infiltration, opaque surface conduction, natural ventilation, mechanical ventilation, and cooling. For enhanced comparability and interpretation, all data were converted into kWh.
 
+**Bar Chart**
+---------------------
+
+.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\1.Bar.jpg
+  :alt: Bar chart visualization
+  :align: center
+
+This visualization presents the distribution of the building’s annual energy balance (kWh/m²) by energy type and space, allowing a comparative analysis across zones. Each bar represents a specific energy component—both gains and losses—computed for individual rooms or thermal zones. The stacked format facilitates the identification of which physical processes (e.g., conduction, ventilation, or internal gains) contribute most significantly to the overall energy exchange in each zone. The color scale, consistent with the previous figure, ensures coherence between visualizations and enables immediate recognition of energy categories. This representation supports the evaluation of spatial patterns in energy behavior and helps identify areas with higher thermal loads or inefficiencies.
 
 **Line Chart**
 --------------
@@ -44,7 +52,7 @@ The straightforward design of the line chart facilitates data comparison and cle
 **Heatmap**
 -----------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\3.Heatmap_2.jpg
+.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\3.Heatmap.jpg
   :alt: Heatmap visualization
   :align: center
 

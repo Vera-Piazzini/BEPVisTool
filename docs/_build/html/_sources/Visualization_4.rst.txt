@@ -4,7 +4,7 @@ Radar chart code
 Building Energy Consumption
 ----------------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\4.Radar.jpg
+.. image:: _static\\images\\4.Radar.jpg
   :alt: Radar chart visualization
   :align: center
 

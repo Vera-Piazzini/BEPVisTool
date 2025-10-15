@@ -9,8 +9,9 @@ References
 Pubblications
 *************
 
+- O. Vera-Piazzini, M. Scarpa, 2025, "Building Energy Data Visualizations for Experts: A Usability Evaluation" *International Journal of Human-Computer Interaction* 1-30. `https://doi.org/10.1080/10447318.2025.2531273 <https://doi.org/10.1080/10447318.2025.2531273>`_
+- O. Vera-Piazzini, M. Scarpa, 2024, "Building Energy Model Calibration: A Review of the State of the Art in Approaches, Methods and Tools" *Journal of Building Engineering* Volume 86. `https://doi.org/10.1016/j.jobe.2023.108287 <https://doi.org/10.1016/j.jobe.2023.108287>`_
 - O. Vera-Piazzini, M. Scarpa, F. Peron, 2023, "Building Energy Simulation and Monitoring: A Review of Graphical Data Representation" *Energies* 16, no. 1: 390. `https://doi.org/10.3390/en16010390 <https://doi.org/10.3390/en16010390>`_
-- O. Vera-Piazzini, M. Scarpa, 2023, "Building Energy Model Calibration: A Review of the State of the Art in Approaches, Methods and Tools" *Journal of Building Engineering* `https://doi.org/10.1016/j.jobe.2023.108287 <https://doi.org/10.1016/j.jobe.2023.108287>`_
 
 
 Bibliography
