@@ -4,7 +4,11 @@ Bar chart code
 Building's Energy Balance
 -------------------------
 
-.. image:: c:\\Users\\Ofelia\\SPHINX_DOCUMENTATION\\1.Bar.jpg
+.. image:: _static\\images\\1.StackedBar.jpg
+  :alt: Stacked Bar chart visualization
+  :align: center
+
+.. image:: _static\\images\\1.Bar.jpg
   :alt: Bar chart visualization
   :align: center
 
