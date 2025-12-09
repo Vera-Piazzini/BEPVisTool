@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 project = 'BEPVis Tool Documentation'
-copyright = '2024, O.Vera-Piazzini, M.Scarpa'
+copyright = '2025, O.Vera-Piazzini, M.Scarpa'
 author = 'O. Vera-Piazzini, M. Scarpa'
 release = '1.00.00'
 

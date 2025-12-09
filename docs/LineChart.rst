@@ -1,0 +1,44 @@
+LineChart – PMV and PPD
+========================
+
+Overview
+--------
+
+This visualization displays the monthly **thermal comfort indicators** 
+Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD) 
+computed from EnergyPlus simulations.  
+It provides a clear temporal overview of comfort performance across spaces, 
+highlighting periods of discomfort and helping evaluate HVAC operation, 
+occupancy schedules, and microclimatic conditions.
+
+
+Predicted Mean Vote (PMV) index
+--------------------------------
+
+Example Figures
+----------------
+
+.. image:: _static\\images\\2.Line_PMV.jpg
+  :alt: Line chart visualization
+  :align: center
+
+  .. image:: _static\\images\\2.Line_PPD.jpg
+  :alt: Line chart visualization
+  :align: center
+
+LineChart Module
+----------------
+.. automodule:: Visualizations.LineChart.LineChart
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Package contents
+----------------
+
+.. automodule:: Visualizations.LineChart
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
