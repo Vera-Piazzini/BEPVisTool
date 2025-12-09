@@ -34,3 +34,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+html_context = {"github_url": "https://github.com", # o il tuo dominio
+                "github_user": "vera-piazzini", # Il tuo username
+                "github_repo": "BEPVisTool", # Il nome esatto del repository
+                "github_version": "main", # o "master", a seconda del branch che usi per GH Pages
+                "conf_py_path": "/docs/" # o dove si trova il conf.py, se usi una sottocartella
+}
