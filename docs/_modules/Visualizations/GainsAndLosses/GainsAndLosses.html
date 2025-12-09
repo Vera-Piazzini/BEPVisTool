@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizations.GainsAndLosses.GainsAndLosses &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=795c39da"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">BEPVis Data Visualization Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Data Visualizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Visualizations.GainsAndLosses.GainsAndLosses</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Visualizations.GainsAndLosses.GainsAndLosses</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">GainsAndLosses Visualizations</span>
+<span class="sd">=============================</span>
+
+<span class="sd">This module contains two visualization classes used in the BEPVis project:</span>
+
+<span class="sd">- ``GainsAndLosses_Spaces``:</span>
+<span class="sd">    Creates stacked bar charts (annual + monthly) showing heat gains and losses</span>
+<span class="sd">    for a single zone or for the entire building.</span>
+
+<span class="sd">- ``GainsAndLosses_Parameters``:</span>
+<span class="sd">    Aggregates gains/losses by parameter (solar, lights, equipment, infiltration…)</span>
+<span class="sd">    and generates compact bar charts comparing all building zones.</span>
+
+<span class="sd">These modules are automatically called by ``BEPVis_Manager``, but they can also</span>
+<span class="sd">be used independently if the input DataFrame format is respected.</span>
+
+<span class="sd">Output</span>
+<span class="sd">------</span>
+<span class="sd">Each visualization produces:</span>
+<span class="sd">- An interactive HTML file (Bokeh)</span>
+<span class="sd">- Optionally PNG export (if configured)</span>
+
+<span class="sd">Author: Ofelia Vera-Piazzini, Massimiliano Scarpa (Università Iuav di Venezia)</span>
+<span class="sd">License: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">ColumnDataSource</span><span class="p">,</span> <span class="n">Title</span><span class="p">,</span> <span class="n">Legend</span><span class="p">,</span> <span class="n">NumeralTickFormatter</span><span class="p">,</span> <span class="n">Span</span>
+<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">RdYlBu11</span><span class="p">,</span> <span class="n">Turbo256</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">figure</span><span class="p">,</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="kn">import</span> <span class="n">row</span><span class="p">,</span> <span class="n">column</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">output_file</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="c1"># ======================================================================</span>
+<span class="c1"># CLASS 1 — GAINS AND LOSSES PER SPACE (Annual + Monthly Stacked Charts)</span>
+<span class="c1"># ======================================================================</span>
+
+<div class="viewcode-block" id="GainsAndLosses_Spaces">
+<a class="viewcode-back" href="../../../GainsAndLosses.html#Visualizations.GainsAndLosses.GainsAndLosses.GainsAndLosses_Spaces">[docs]</a>
+<span class="k">class</span> <span class="nc">GainsAndLosses_Spaces</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate bar charts showing monthly and annual heat gains and losses</span>
+<span class="sd">    for a given space (or aggregated building level).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df_gains : pandas.DataFrame</span>
+<span class="sd">        Monthly gains for each type. Columns follow:</span>
+<span class="sd">        [&#39;Month&#39;, &#39;*Zone* - Solar&#39;, &#39;*Zone* - Lights&#39;, ...].</span>
+<span class="sd">    df_losses : pandas.DataFrame</span>
+<span class="sd">        Monthly losses (same format as gains, but values negative).</span>
+<span class="sd">    gains_max_month : float</span>
+<span class="sd">        Max monthly total gains found across all zones (for plotting scale).</span>
+<span class="sd">    gains_max_year : float</span>
+<span class="sd">        Max annual gains found across all zones (for plotting scale).</span>
+<span class="sd">    losses_min_month : float</span>
+<span class="sd">        Min monthly total losses (negative values).</span>
+<span class="sd">    losses_min_year : float</span>
+<span class="sd">        Min annual losses (negative values).</span>
+<span class="sd">    filesave_name : str</span>
+<span class="sd">        Output filename (without extension).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Values are assumed already normalized per floor area (kWh/m²).</span>
+<span class="sd">    - This visualization produces an HTML file with two stacked charts:</span>
+<span class="sd">        * Annual energy balance</span>
+<span class="sd">        * Monthly energy balance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df_gains</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">df_losses</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">gains_max_month</span> <span class="o">=</span>  <span class="s1">&#39;?&#39;</span><span class="p">,</span> 
+                 <span class="n">gains_max_year</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">losses_min_month</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">losses_min_year</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> 
+                 <span class="n">filesave_name</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">):</span>
+        
+        <span class="c1"># Remove unwanted excel columns (e.g. &quot;Unnamed:…&quot;)</span>
+        <span class="n">df_gains</span> <span class="o">=</span> <span class="n">df_gains</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">df_gains</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df_gains</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;Unnamed&#39;</span><span class="p">)],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">df_losses</span> <span class="o">=</span> <span class="n">df_losses</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">df_losses</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df_losses</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;Unnamed&#39;</span><span class="p">)],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Extract axes labels and energy component names</span>
+        <span class="n">months</span> <span class="o">=</span> <span class="n">df_gains</span><span class="p">[</span><span class="s1">&#39;Month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">types_gains</span> <span class="o">=</span> <span class="n">df_gains</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> 
+        <span class="n">types_losses</span> <span class="o">=</span> <span class="n">df_losses</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="c1"># Total annual values for the stacked annual chart</span>
+        <span class="n">annual_gains</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">df_gains</span><span class="p">[</span><span class="nb">type</span><span class="p">])</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="n">types_gains</span><span class="p">]</span>
+        <span class="n">annual_losses</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">df_losses</span><span class="p">[</span><span class="nb">type</span><span class="p">])</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="n">types_losses</span><span class="p">]</span>
+
+        <span class="c1"># Axis scaling (rounded to nice values)</span>
+        <span class="n">y_limit_max_annual</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">gains_max_year</span><span class="o">/</span><span class="mi">50</span><span class="p">)</span><span class="o">*</span><span class="mi">50</span>
+        <span class="n">y_limit_min_annual</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">losses_min_year</span><span class="o">/</span><span class="mi">50</span><span class="p">)</span><span class="o">*</span><span class="mi">50</span>
+        
+        <span class="n">y_limit_max_monthly</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">gains_max_month</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span>
+        <span class="n">y_limit_min_monthly</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">losses_min_month</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span>
+
+        <span class="c1"># Prepare ColumnDataSource for annual chart</span>
+        <span class="n">source_data_annual_gains</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Annual&#39;</span><span class="p">],</span>
+            <span class="o">**</span><span class="p">{</span><span class="nb">type</span><span class="p">:</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">df_gains</span><span class="p">[</span><span class="nb">type</span><span class="p">])]</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="n">types_gains</span><span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">source_data_annual_losses</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Annual&#39;</span><span class="p">],</span>
+            <span class="o">**</span><span class="p">{</span><span class="nb">type</span><span class="p">:</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">df_losses</span><span class="p">[</span><span class="nb">type</span><span class="p">])]</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="n">types_losses</span><span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Prepare ColumnDataSource for monthly chart</span>
+        <span class="n">source_data_monthly_gains</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">months</span><span class="p">,</span>
+            <span class="o">**</span><span class="p">{</span><span class="nb">type</span><span class="p">:</span> <span class="n">df_gains</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="n">types_gains</span><span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">source_data_monthly_losses</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">months</span><span class="p">,</span>
+            <span class="o">**</span><span class="p">{</span><span class="nb">type</span><span class="p">:</span> <span class="n">df_losses</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="n">types_losses</span><span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Color palettes (subsample Turbo256 for visual consistency)</span>
+        <span class="n">reverse_palette</span> <span class="o">=</span> <span class="p">[</span><span class="n">Turbo256</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">Turbo256</span><span class="p">),</span><span class="mi">10</span><span class="p">)]</span>
+        <span class="n">original_palette</span> <span class="o">=</span> <span class="n">reverse_palette</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;$name&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Value&quot;</span><span class="p">,</span> <span class="s2">&quot;@$name</span><span class="si">{0.00}</span><span class="s2"> kWh/m2&quot;</span><span class="p">)]</span>
+
+        <span class="c1"># ----------------------</span>
+        <span class="c1"># Annual Energy Balance</span>
+        <span class="c1"># ----------------------</span>
+        
+        <span class="n">p_annual_gains</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">x_range</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Annual&#39;</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">380</span><span class="p">,</span> 
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Total Annual Energy Balance by Type&quot;</span><span class="p">,</span>
+            <span class="n">toolbar_location</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span> <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span> 
+            <span class="n">min_border</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="n">y_limit_min_annual</span><span class="p">,</span> <span class="n">y_limit_max_annual</span><span class="p">))</span>
+
+        <span class="n">hatch_patterns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;`&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">]</span>
+        
+        <span class="c1"># Plot stacked bars for gains and losses on the same chart</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">vbar_stack</span><span class="p">(</span><span class="n">types_gains</span><span class="p">,</span>
+                                  <span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
+                                  <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                                  <span class="n">color</span><span class="o">=</span><span class="n">original_palette</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">types_gains</span><span class="p">)][::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="n">source</span><span class="o">=</span><span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">source_data_annual_gains</span><span class="p">))</span>
+
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">vbar_stack</span><span class="p">(</span><span class="n">types_losses</span><span class="p">,</span>
+                                   <span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
+                                   <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                                   <span class="n">color</span><span class="o">=</span><span class="n">reverse_palette</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">types_losses</span><span class="p">)][::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                   <span class="n">source</span><span class="o">=</span><span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">source_data_annual_losses</span><span class="p">))</span>
+        
+        <span class="c1"># Customize annual chart appearance</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">minor_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">outline_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Energy Balance (kWh/m2)&quot;</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="s2">&quot;horizontal&quot;</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">NumeralTickFormatter</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;0,0&quot;</span><span class="p">)</span>
+        
+        <span class="c1">#Adjust y-axis range for visual consistency between charts</span>
+        <span class="n">ratio_y_annual</span> <span class="o">=</span> <span class="n">y_limit_max_annual</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="n">y_limit_min_annual</span><span class="p">)</span>
+        <span class="n">ratio_y_monthly</span> <span class="o">=</span> <span class="n">y_limit_max_monthly</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="n">y_limit_min_monthly</span><span class="p">)</span>
+        <span class="n">y_limit_min_monthly</span> <span class="o">=</span> <span class="n">y_limit_min_monthly</span> <span class="o">*</span> <span class="n">ratio_y_monthly</span> <span class="o">/</span> <span class="n">ratio_y_annual</span>
+        
+        <span class="c1"># ----------------------</span>
+        <span class="c1"># Monthly Energy Balance</span>
+        <span class="c1"># ----------------------</span>
+       
+        <span class="n">p_monthly_gains</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">x_range</span><span class="o">=</span><span class="n">months</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="n">y_limit_min_monthly</span><span class="p">,</span> <span class="n">y_limit_max_monthly</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Building Energy Balance by Month and Type&quot;</span><span class="p">,</span>
+                <span class="n">toolbar_location</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span> <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">)</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">vbar_stack</span><span class="p">(</span><span class="n">types_gains</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">original_palette</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">types_gains</span><span class="p">)][::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">source_data_monthly_gains</span><span class="p">))</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">vbar_stack</span><span class="p">(</span><span class="n">types_losses</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">reverse_palette</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">types_losses</span><span class="p">)][::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">source</span><span class="o">=</span><span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">source_data_monthly_losses</span><span class="p">))</span>
+
+        <span class="c1"># Customize monthly chart appearance</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">x_range</span><span class="o">.</span><span class="n">range_padding</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">minor_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">outline_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Months&quot;</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s2">&quot;Energy Balance (kWh/m2)&quot;</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="s2">&quot;horizontal&quot;</span>
+
+        <span class="c1"># ----------------------</span>
+        <span class="c1"># Legend Configuration</span>
+        <span class="c1"># ----------------------</span>
+
+        <span class="c1"># Reorder gains (reversed) for consistent legend display</span>
+        <span class="n">ordered_types_gains</span> <span class="o">=</span> <span class="n">types_gains</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">ordered_types_losses</span> <span class="o">=</span> <span class="n">types_losses</span>
+
+        <span class="c1"># Create the legend items with the adjusted order</span>
+        <span class="n">legend_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ordered_types_gains</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">types_gains</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> 
+            <span class="n">legend_items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="p">[</span><span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">renderers</span><span class="p">[</span><span class="n">index</span><span class="p">]]))</span>  <span class="c1"># Gains</span>
+
+        <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">types_gains</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ordered_types_losses</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">types_losses</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> 
+            <span class="n">legend_items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="p">[</span><span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">renderers</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">index</span><span class="p">]]))</span>  <span class="c1"># Losses</span>
+
+        <span class="n">legend</span> <span class="o">=</span> <span class="n">Legend</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">legend_items</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">glyph_height</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">glyph_width</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">legend</span><span class="o">.</span><span class="n">border_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Add the legend</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">legend</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">click_policy</span> <span class="o">=</span> <span class="s2">&quot;hide&quot;</span>
+
+        <span class="c1"># ----------------------</span>
+        <span class="c1"># Span for Zero Line</span>
+        <span class="c1"># ----------------------</span>
+
+        <span class="n">span1</span> <span class="o">=</span> <span class="n">Span</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">p_annual_gains</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">span1</span><span class="p">)</span>
+        <span class="n">p_monthly_gains</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">span1</span><span class="p">)</span>
+        
+        <span class="c1"># ----------------------</span>
+        <span class="c1"># Final Layout</span>
+        <span class="c1"># ----------------------</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">row</span><span class="p">(</span><span class="n">p_annual_gains</span><span class="p">,</span> <span class="n">p_monthly_gains</span><span class="p">)</span>
+        <span class="n">output_file</span><span class="p">(</span><span class="n">filesave_name</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span><span class="p">)</span>
+        <span class="c1"># Display the layout</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span></div>
+
+
+<span class="c1"># =======================================================================</span>
+<span class="c1"># CLASS 2 — GAINS AND LOSSES BY PARAMETER (Compact Zone Comparison Plots)</span>
+<span class="c1"># =======================================================================</span>
+<div class="viewcode-block" id="GainsAndLosses_Parameters">
+<a class="viewcode-back" href="../../../GainsAndLosses.html#Visualizations.GainsAndLosses.GainsAndLosses.GainsAndLosses_Parameters">[docs]</a>
+<span class="k">class</span> <span class="nc">GainsAndLosses_Parameters</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create compact bar charts showing gains and losses by type and by zone.</span>
+
+<span class="sd">    These charts aggregate annual gains/losses for each parameter</span>
+<span class="sd">    (solar, equipment, conduction…) across all zones.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s_zone_name : list[str]</span>
+<span class="sd">        List of zone names in display order.</span>
+<span class="sd">    data_gains : pandas.DataFrame</span>
+<span class="sd">        Annual gains per zone and per parameter.</span>
+<span class="sd">    data_losses : pandas.DataFrame</span>
+<span class="sd">        Annual losses per zone and per parameter.</span>
+<span class="sd">    filesave_name : str</span>
+<span class="sd">        Output HTML file name (without extension).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_zone_name</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">data_gains</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">data_losses</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">filesave_name</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span> <span class="o">=</span> <span class="n">s_zone_name</span>
+
+        <span class="c1"># -------------------------------------------------------</span>
+        <span class="c1"># Extract gain and loss types from DataFrame column names</span>
+        <span class="c1"># -------------------------------------------------------</span>
+
+        <span class="c1"># Gain types appear as &quot;*Zone* - Type&quot;</span>
+        <span class="n">types_gains</span> <span class="o">=</span> <span class="n">data_gains</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">types_gains</span><span class="p">)):</span>
+            <span class="n">types_gains</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">types_gains</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;* - &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">types_gains</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">types_gains</span><span class="p">))</span>
+        <span class="n">ordered_types_gains</span> <span class="o">=</span> <span class="n">types_gains</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Build aggregated gain table per zone</span>
+        <span class="n">dict_gains</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Space&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">type_gain</span> <span class="ow">in</span> <span class="n">types_gains</span><span class="p">:</span>
+            <span class="n">dict_gains</span><span class="p">[</span><span class="n">type_gain</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="p">)</span>
+        
+        <span class="n">s_column</span> <span class="o">=</span> <span class="n">data_gains</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="n">s_column</span><span class="p">:</span>
+            <span class="n">zone_name</span> <span class="o">=</span> <span class="n">column_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;* - &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">gain_name</span> <span class="o">=</span> <span class="n">column_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;* - &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dict_gains</span><span class="p">[</span><span class="n">gain_name</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">zone_name</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">data_gains</span><span class="p">[</span><span class="n">column_name</span><span class="p">]))</span>
+
+        <span class="c1"># Losses</span>
+        <span class="n">types_losses</span> <span class="o">=</span> <span class="n">data_losses</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">types_losses</span><span class="p">)):</span>
+            <span class="n">types_losses</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">types_losses</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;* - &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">types_losses</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">types_losses</span><span class="p">))</span>
+        <span class="n">ordered_types_losses</span> <span class="o">=</span> <span class="n">types_losses</span>
+        
+        <span class="c1"># Initialize a dictionary to accumulate losses per zone</span>
+        <span class="n">dict_losses</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Space&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">type_loss</span> <span class="ow">in</span> <span class="n">types_losses</span><span class="p">:</span>
+            <span class="n">dict_losses</span><span class="p">[</span><span class="n">type_loss</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="p">)</span>
+        
+        <span class="n">s_column</span> <span class="o">=</span> <span class="n">data_losses</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="n">s_column</span><span class="p">:</span>
+            <span class="n">zone_name</span> <span class="o">=</span> <span class="n">column_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;* - &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">loss_name</span> <span class="o">=</span> <span class="n">column_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;* - &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dict_losses</span><span class="p">[</span><span class="n">loss_name</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">zone_name</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">data_losses</span><span class="p">[</span><span class="n">column_name</span><span class="p">]))</span>
+
+        <span class="c1"># Colors and tooltips</span>
+        <span class="n">palette_losses</span> <span class="o">=</span> <span class="p">[</span><span class="n">Turbo256</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">Turbo256</span><span class="p">),</span> <span class="mi">10</span><span class="p">)]</span>
+        <span class="n">palette_gains</span> <span class="o">=</span> <span class="n">palette_losses</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;$name&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Value&quot;</span><span class="p">,</span> <span class="s2">&quot;@$name</span><span class="si">{0.0}</span><span class="s2"> kWh/m2&quot;</span><span class="p">)]</span>
+        
+        <span class="c1"># -------------------------</span>
+        <span class="c1"># Rendering gain bar charts</span>
+        <span class="c1"># -------------------------</span>
+
+        <span class="n">gains_plots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gain_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ordered_types_gains</span><span class="p">):</span>
+            <span class="n">source_data_gains</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="p">,</span>
+                <span class="n">gain_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">dict_gains</span><span class="p">[</span><span class="n">gain_type</span><span class="p">])</span>
+            <span class="p">}</span>
+            <span class="n">source_gains</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">source_data_gains</span><span class="p">)</span>
+                    
+            <span class="n">p</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">x_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+                        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gain_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">title_location</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+                        <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span> <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">gain_type</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">palette_gains</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">palette_gains</span><span class="p">)],</span>
+                    <span class="n">source</span><span class="o">=</span><span class="n">source_gains</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">gain_type</span><span class="p">)</span>
+            
+            <span class="c1"># Customize appearance</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">ygrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">minor_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">outline_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text_font_size</span> <span class="o">=</span> <span class="s2">&quot;10px&quot;</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">align</span> <span class="o">=</span> <span class="s2">&quot;center&quot;</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;0pt&quot;</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;5pt&quot;</span>
+            <span class="n">gains_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+            <span class="c1"># Display title only on the first chart to avoid repetition</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">Title</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Energy Gains and Losses (kWh/m2)&quot;</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">),</span> <span class="s2">&quot;above&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># -------------------------</span>
+        <span class="c1"># Rendering loss bar charts</span>
+        <span class="c1"># -------------------------</span>
+        
+        <span class="n">losses_plots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">loss_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ordered_types_losses</span><span class="p">):</span>
+            <span class="n">source_data_losses</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="p">,</span>
+                <span class="n">loss_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">dict_losses</span><span class="p">[</span><span class="n">loss_type</span><span class="p">])</span>
+            <span class="p">}</span>
+            <span class="n">source_losses</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">source_data_losses</span><span class="p">)</span>
+                    
+            <span class="n">p</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">x_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s_zone_name</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+                        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">loss_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">title_location</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+                        <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span> <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">loss_type</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">palette_losses</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">palette_losses</span><span class="p">)],</span>
+                    <span class="n">source</span><span class="o">=</span><span class="n">source_losses</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">loss_type</span><span class="p">)</span>
+            
+            <span class="c1"># Customize appearance</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">ygrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span> 
+            <span class="n">p</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">minor_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">outline_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text_font_size</span> <span class="o">=</span> <span class="s2">&quot;10px&quot;</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;5pt&quot;</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">align</span> <span class="o">=</span> <span class="s2">&quot;center&quot;</span>
+
+            <span class="n">losses_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+            <span class="c1"># Only show X-axis labels on the last losses chart for clarity</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">types_losses</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;0pt&quot;</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;8pt&quot;</span>
+
+        <span class="c1"># ----------------------</span>
+        <span class="c1"># Final Layout</span>
+        <span class="c1"># ----------------------</span>
+        
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">column</span><span class="p">(</span><span class="o">*</span><span class="n">gains_plots</span><span class="p">,</span> <span class="o">*</span><span class="n">losses_plots</span><span class="p">)</span>
+        <span class="n">output_file</span><span class="p">(</span><span class="n">filesave_name</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

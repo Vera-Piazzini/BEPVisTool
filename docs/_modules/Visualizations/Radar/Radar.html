@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizations.Radar.Radar &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=795c39da"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">BEPVis Data Visualization Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Data Visualizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Visualizations.Radar.Radar</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Visualizations.Radar.Radar</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Radar Chart Visualizations</span>
+<span class="sd">==========================</span>
+
+<span class="sd">This module implements the ``rdr`` class used in the BEPVis project to generate</span>
+<span class="sd">one radar chart per building zone, with an associated bar chart providing</span>
+<span class="sd">a secondary view of the same indicators.</span>
+
+<span class="sd">Each zone receives:</span>
+<span class="sd">    - A radar chart (primary energy contributions per category)</span>
+<span class="sd">    - A bar chart (absolute values per category)</span>
+
+<span class="sd">The radar displays:</span>
+<span class="sd">    - A set of unfilled traces (one per zone) for comparison</span>
+<span class="sd">    - A filled trace highlighting the active zone</span>
+<span class="sd">    - Hover information for the highlighted zone</span>
+<span class="sd">    - Colors assigned automatically using the Glasbey palette</span>
+
+<span class="sd">The bar chart displays:</span>
+<span class="sd">    - The absolute primary energy consumption for the selected zone</span>
+<span class="sd">    - Consistent colors with the radar filled trace</span>
+
+<span class="sd">The layout is produced using Plotly, with 2 rows:</span>
+<span class="sd">    Row 1: Radar charts (polar)</span>
+<span class="sd">    Row 2: Bar charts</span>
+
+<span class="sd">Input Format</span>
+<span class="sd">------------</span>
+<span class="sd">The Excel file must contain:</span>
+
+<span class="sd">    Zone | Category1 | Category2 | Category3 | ...</span>
+
+<span class="sd">Each row represents one space/zone.</span>
+<span class="sd">Every column after &quot;Zone&quot; is a primary energy category.</span>
+
+<span class="sd">Authors: Ofelia Vera-Piazzini, Massimiliano Scarpa (Università Iuav di Venezia)  </span>
+<span class="sd">License: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">from</span> <span class="nn">plotly.subplots</span> <span class="kn">import</span> <span class="n">make_subplots</span>
+<span class="kn">import</span> <span class="nn">colorcet</span> <span class="k">as</span> <span class="nn">cc</span>
+
+<span class="c1"># ============================================================================</span>
+<span class="c1"># RADAR CLASS</span>
+<span class="c1"># ============================================================================</span>
+<div class="viewcode-block" id="rdr">
+<a class="viewcode-back" href="../../../Radar.html#Visualizations.Radar.Radar.rdr">[docs]</a>
+<span class="k">class</span> <span class="nc">rdr</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a radar chart + bar chart for each zone in the dataset.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source_file_pathandname : str</span>
+<span class="sd">        Path to an Excel file.  </span>
+<span class="sd">        Columns must include:</span>
+<span class="sd">            - &#39;Zone&#39; (string)</span>
+<span class="sd">            - All other columns are radar categories.</span>
+<span class="sd">    filesave_name : str</span>
+<span class="sd">        Output filename (HTML) without extension.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The function generates one radar per zone, aligned horizontally.</span>
+<span class="sd">    - Each radar has a filled line for the selected zone, and thin lines for</span>
+<span class="sd">      all other zones for comparison.</span>
+<span class="sd">    - A bar chart below each radar shows the absolute values per category.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_file_pathandname</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">filesave_name</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">):</span>
+        
+        <span class="c1"># Load and prepare data</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">source_file_pathandname</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Unnamed: 0&#39;</span><span class="p">])</span> <span class="c1"># Remove unnecessary column</span>
+        <span class="n">s_zone_name</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Zone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span> <span class="c1"># List of zone names</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="c1"># Radar axes: column names excluding &#39;Zone&#39;</span>
+
+        <span class="c1"># Initialize dictionary to store data for each space</span>
+        <span class="n">spaces_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># CREATE TRACE STRUCTURE FOR EACH ZONE</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="c1"># Read data from each sheet</span>
+        <span class="k">for</span> <span class="n">n_zone_name</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s_zone_name</span><span class="p">)):</span>
+            <span class="n">s_color</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">glasbey_bw</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">s_zone_name</span><span class="p">)]</span> <span class="c1"># Assign unique color to each space</span>
+
+            <span class="c1"># Process each row in the dataframe</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="c1"># Unfilled radar line for comparison</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Zone&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:])],</span>
+                    <span class="s1">&#39;fill&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;rgb(&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s_color</span><span class="p">[</span><span class="n">_</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> \
+                                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s_color</span><span class="p">[</span><span class="n">_</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> \
+                                <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s_color</span><span class="p">[</span><span class="n">_</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;line_width&#39;</span><span class="p">:</span> <span class="mf">0.8</span>
+                <span class="p">})</span>
+                <span class="c1"># Filled radar line for the current zone</span>
+                <span class="k">if</span> <span class="n">s_zone_name</span><span class="p">[</span><span class="n">n_zone_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Zone&#39;</span><span class="p">]:</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Zone&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]],</span>
+                        <span class="s1">&#39;fill&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;color&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;line_width&#39;</span><span class="p">:</span> <span class="mf">1.5</span>
+                    <span class="p">})</span>
+
+            <span class="c1"># Add processed zone data to the dictionary</span>
+            <span class="n">spaces_data</span><span class="p">[</span><span class="n">s_zone_name</span><span class="p">[</span><span class="n">n_zone_name</span><span class="p">]]</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># INITIALIZE SUBPLOTS</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="c1"># Create subplots with 2 rows and 5 columns, each with a polar layout</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">(</span>
+            <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">s_zone_name</span><span class="p">),</span>
+            <span class="n">subplot_titles</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;&lt;b&gt;&lt;span style=&#39;font-size:12px&#39;&gt;</span><span class="si">{</span><span class="n">space</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span> <span class="k">for</span> <span class="n">space</span> <span class="ow">in</span> <span class="n">spaces_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()],</span>
+            <span class="n">specs</span><span class="o">=</span><span class="p">[[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;polar&#39;</span><span class="p">}]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">s_zone_name</span><span class="p">),</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">}]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">s_zone_name</span><span class="p">)],</span>
+            <span class="n">column_widths</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">s_zone_name</span><span class="p">),</span>
+            <span class="n">horizontal_spacing</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="n">vertical_spacing</span><span class="o">=</span><span class="mf">0.01</span>
+        <span class="p">)</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># ADD RADAR CHARTS (ROW 1)</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="c1"># Loop through each space</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spaces_data</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># Find the product that should display the hover text (Fill=True, Line Width=1.5, and matching name)</span>
+            <span class="n">hover_product</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">product</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span> <span class="k">if</span> <span class="n">product</span><span class="p">[</span><span class="s1">&#39;fill&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">product</span><span class="p">[</span><span class="s1">&#39;line_width&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1.5</span> <span class="ow">and</span> <span class="n">product</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">space</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+            
+            <span class="c1"># Add traces for each product in the space</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
+                <span class="n">fill</span> <span class="o">=</span> <span class="s1">&#39;toself&#39;</span> <span class="k">if</span> <span class="n">product</span><span class="p">[</span><span class="s1">&#39;fill&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>  <span class="c1"># Determine fill property based on the current product</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">product</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">product</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])]</span>  <span class="c1"># Convertir valores negativos a positivos</span>
+                <span class="c1">#r = product[&#39;r&#39;] + [product[&#39;r&#39;][0]]  # Append the starting point to close the line</span>
+                <span class="n">hover_info</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span> <span class="k">if</span> <span class="n">product</span> <span class="o">==</span> <span class="n">hover_product</span> <span class="k">else</span> <span class="s1">&#39;none&#39;</span>  <span class="c1"># Show hover text only for the hover product</span>
+                <span class="n">hover_text</span> <span class="o">=</span> <span class="kc">None</span> 
+
+                <span class="c1"># Display hover text only for the hover product</span>
+                <span class="k">if</span> <span class="n">hover_info</span> <span class="o">==</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span>
+                    <span class="n">total_consumption</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">product</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">]])</span> 
+                    <span class="c1">#total_consumption = sum(product[&#39;r&#39;])</span>
+                    <span class="n">hover_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;b&gt;</span><span class="si">{</span><span class="n">product</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&lt;/b&gt;&lt;br&gt;Total Consumption: </span><span class="si">{</span><span class="n">total_consumption</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> kWh/m2&#39;</span>
+                        
+                <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Scatterpolar</span><span class="p">(</span>
+                    <span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span>
+                    <span class="n">theta</span><span class="o">=</span><span class="n">categories</span> <span class="o">+</span> <span class="p">[</span><span class="n">categories</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>  <span class="c1"># Append the first category to close the line</span>
+                    <span class="n">fill</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">product</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span>  <span class="c1"># Set mode to &#39;lines&#39; to remove points on edges</span>
+                    <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">product</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="n">product</span><span class="p">[</span><span class="s1">&#39;line_width&#39;</span><span class="p">]),</span>  <span class="c1"># Customize line color and width</span>
+                    <span class="n">hoverinfo</span><span class="o">=</span><span class="n">hover_info</span><span class="p">,</span>
+                    <span class="n">hovertext</span><span class="o">=</span><span class="n">hover_text</span><span class="p">,</span>
+                    <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">),</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># DETERMINE GLOBAL MAX FOR BAR CHART AXIS</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="n">max_y_value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">n_category</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)):</span>
+                <span class="n">max_y_value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_y_value</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">n_category</span><span class="p">]))</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># ADD BAR CHARTS (ROW 2)</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spaces_data</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># Define the index of the line to use for the bar chart for each space</span>
+            <span class="n">bar_line_index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># Assuming each space&#39;s bar chart uses the corresponding line</span>
+
+            <span class="c1"># Use the first line as the &quot;bar reference&quot;</span>
+            <span class="n">bar_data</span> <span class="o">=</span> <span class="n">products</span><span class="p">[</span><span class="n">bar_line_index</span><span class="p">]</span>
+            <span class="n">bar_data</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">bar_data</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">]]</span>
+
+
+            <span class="c1"># Add bar chart for each space</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span><span class="n">go</span><span class="o">.</span><span class="n">Bar</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">categories</span><span class="p">,</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">bar_data</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">],</span>  <span class="c1"># Use the &#39;r&#39; data from the specified line</span>
+                <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">bar_data</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]),</span>
+                <span class="n">hovertemplate</span><span class="o">=</span><span class="s1">&#39;&lt;b&gt;%</span><span class="si">{x}</span><span class="s1">&lt;/b&gt;: %</span><span class="si">{y}</span><span class="s1"> kWh/m2&lt;extra&gt;&lt;/extra&gt;&#39;</span><span class="p">,</span>  <span class="c1"># Remove &quot;trace&quot; label in tooltip</span>
+                <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">),</span> <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="c1"># Axis and layout customization for each bar chart</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">9</span><span class="p">),</span> <span class="n">title_standoff</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">9</span><span class="p">),</span> <span class="n">title_standoff</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">9</span><span class="p">))</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_xaxes</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="c1"># Update y-axis range and title for the bar chart to ensure consistency</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">update_yaxes</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_y_value</span><span class="p">],</span> <span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">title_text</span><span class="o">=</span><span class="s2">&quot;Primary Energy Consumption (kWh/m2)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># LAYOUT SETTINGS</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+        
+        <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="mi">650</span><span class="p">,</span>
+            <span class="n">title_text</span><span class="o">=</span><span class="s2">&quot;Building Primary Energy Consumption (kWh/m2) by Space and Type&quot;</span><span class="p">,</span> 
+            <span class="n">title_font</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="c1"># Export HTML</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">filesave_name</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

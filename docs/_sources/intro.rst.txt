@@ -1,0 +1,165 @@
+.. Sphinx Documentation documentation master file, created by
+   sphinx-quickstart on Mon Feb 19 14:35:56 2024.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+BEPVis Data Visualization Tool
+==============================
+
+Presentation
+************
+
+The **BEPVis** data visualization tool streamlines the exploration and analysis of 
+large datasets from building energy simulations.  
+Its main objectives are:
+
+- to generate clear, insightful visualizations tailored for expert users,
+- to support the interpretation of key performance indicators (KPIs),
+- to facilitate decision-making for building energy optimization,
+- and to contribute to sustainability and overall operational efficiency.
+
+Five interactive visualization types were implemented and evaluated:
+
+1. stacked bar chart  
+2. heatmap  
+3. line chart  
+4. radar chart  
+5. scatter plot  
+
+Due to the diverse design characteristics of these visual forms, the representation of 
+performance indicators and time scales varies according to the analytical purpose of each 
+visualization [`1 <https://link.springer.com/article/10.1007/s00187-020-00294-0>`_]
+[`2 <https://www.sciencedirect.com/science/article/pii/S0959652622024350>`_].
+
+The visualizations follow principles of clarity, simplicity, and effective communication.  
+Design choices such as dimensional simplicity, visual balance, and objective representation 
+were guided by established visualization literature 
+[`3 <http://dx.doi.org/10.1177/1473871614550537>`_]
+[`4 <https://www.sciencedirect.com/science/article/abs/pii/S2210670715000499>`_]
+[`5 <https://onlinelibrary.wiley.com/doi/10.1111/cgf.13990>`_]
+[`6 <https://dl.acm.org/doi/10.5555/2385879>`_]
+[`7 <https://dl.acm.org/doi/10.5555/1206491>`_].
+
+All graphics were developed in **Python (VS Code)** using **Bokeh** and **Plotly**, with a 
+strong focus on interactivity, web-based accessibility, and unbiased interpretation.
+
+This work is part of a doctoral research project at 
+`Iuav University of Venice <https://www-archive.iuav.it/homepage/index.htm>`_, 
+and represents the first version of a visualization library that will be expanded and refined.
+
+
+Developed Visualizations
+************************
+
+**Stacked Bar Chart**
+---------------------
+
+.. image:: _static\\images\\1.StackedBar.jpg
+  :alt: Stacked Bar chart visualization
+  :align: center
+
+This visualization displays the building’s **energy balance (kWh)** by stacking multiple 
+energy components.  
+Two charts—annual and monthly—are presented side by side to reveal temporal patterns.  
+A unified legend maintains a consistent colour scale across energy types.
+
+The stacked structure allows users to quickly understand how processes such as heating, 
+solar gains, lighting, equipment, people, envelope conduction, natural ventilation, 
+mechanical ventilation, and cooling contribute to total gains and losses.  
+All values are expressed in kWh to ensure comparability.
+
+**Bar Chart**
+---------------------
+
+.. image:: _static\\images\\1.Bar.jpg
+  :alt: Bar chart visualization
+  :align: center
+
+The annual **energy balance per space (kWh/m²)** is shown for each zone.  
+Each bar represents a specific gain or loss component, facilitating spatial comparison.  
+The consistent colour scale reinforces continuity with the stacked bar chart.
+
+This visualization is useful for identifying zones with high thermal loads or 
+inefficiencies and for understanding which processes dominate the energy behaviour of each space.
+
+**Line Chart**
+--------------
+
+.. image:: _static\\images\\2.Line_PMV.jpg
+  :alt: Line chart visualization
+  :align: center
+
+.. image:: _static\\images\\2.Line_PPD.jpg
+  :alt: Line chart visualization
+  :align: center
+
+
+The line chart shows **monthly Predicted Mean Vote (PMV)** and 
+**Percentage of People Dissatisfied (PPD)** values for each space.  
+Each zone is represented by three lines: mean, minimum, and maximum.  
+
+Shaded comfort bands and dashed reference lines (EN 15251 / ISO 7730) help identify 
+periods when indoor conditions fall inside or outside acceptable thermal comfort ranges.  
+Interactive hover functions provide detailed metadata for each point.
+
+**Heatmap**
+-----------
+
+.. image:: _static\\images\\3.Heatmap.jpg
+  :alt: Heatmap visualization
+  :align: center
+
+Following Levitt’s approach [8], this visualization uses colour gradients to represent 
+**hourly temperature values (°C)** across all days of the year.  
+A secondary heatmap identifies whether each hourly value falls within the recommended 
+comfort range (UNI 10829:1999).
+
+Additional configurations were implemented to present **PMV and PPD** values for 
+the five studied spaces, with thresholds defined according to ASHRAE and ISO 7730 
+(PPD < 15%, PMV between -0.7 and +0.7).
+
+**Radar Chart** 
+---------------
+
+.. image:: _static\\images\\4.Radar.jpg
+  :alt: Radar chart visualization
+  :align: center
+
+This visualization shows the **annual primary energy consumption (kWh)** for each zone, 
+broken down into categories such as heating, cooling, domestic hot water, equipment, 
+lighting, and ventilation.
+
+Each zone has its own radar chart, accompanied by a bar chart to improve readability and 
+prevent visual overlap.  
+This dual representation enables quick comparison of energy signatures between spaces.
+
+
+**Scatter Plot**
+----------------
+
+.. image:: _static\\images\\5.Scatter.jpg
+  :alt: Scatter plot visualization
+  :align: center
+  
+The scatter plot highlights the relationship between **outdoor temperature (°C)** and 
+**hourly heating/cooling ILAS loads (W/m²)**.  
+
+Three time ranges (0–8, 8–19, 19–24) are colour-coded to reveal differences in system behaviour 
+during night-time, daytime, and evening periods.  
+Linear trend lines are included to quantify the strength of the correlation.
+
+This visualization helps assess the responsiveness of HVAC systems and detect possible 
+overheating or overcooling tendencies under varying climatic conditions.
+
+References
+**********
+
+#. L. Perkhofer, et al., 2020, “Does design matter when visualizing Big Data? An empirical study to investigate the effect of visualization type and interaction use,” *J. Manag. Control*, vol. 31, no. 1–2, pp. 55–95, doi: 10.1007/S00187-020-00294-0/TABLES/28.
+#. A. Al-Kababji, et al., 2022, “Interactive visual study for residential energy consumption data,” *J. Clean. Prod.*, vol. 366, p. 132841, doi: 10.1016/J.JCLEPRO.2022.132841.
+#. A. Shamim, et al., 2014, “Evaluation of opinion visualization techniques,” vol. 14, no. 4, pp. 339–358, doi: 10.1177/1473871614550537.
+#. L. K. Murugesan, et al., 2015, “Design criteria for visualization of energy consumption: A systematic literature review,” *Sustain. Cities Soc.*, vol. 18, pp. 1–12, doi: 10.1016/J.SCS.2015.04.009.
+#. L. Cibulski, et al., 2020, “PAVED: Pareto Front Visualization for Engineering Design,” *Comput. Graph. Forum*, vol. 39, no. 3, pp. 405–416, doi: 10.1111/CGF.13990.
+#. S. Few, 2004, "Show Me the Numbers: Designing Tables and Graphs to Enlighten", First Edit. *Analytics Press*.
+#. S. Few, 2006, "Information Dashboard Design: The Effective Visual Communication of Data", 1st ed. *Cambridge* (MA): O’Reilly.
+#. B. Levitt, “Visualizing Climate Data in Excel,” YouTube, 2017. https://www.youtube.com/watch?v=VLSoQy8aXwI (accessed Aug. 22, 2024).
+
