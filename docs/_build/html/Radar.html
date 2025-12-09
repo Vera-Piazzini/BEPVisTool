@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Radar chart - Primary Energy Breakdown &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=795c39da"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Scatter Plot - Heating &amp; Cooling vs Outdoor Temperature" href="ScatterPlot.html" />
+    <link rel="prev" title="LineChart – PMV and PPD" href="LineChart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">BEPVis Data Visualization Tool</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Data Visualizations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="GainsAndLosses.html">Bar chart - Gains &amp; Lossess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Heatmap.html">Heatmap Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LineChart.html">LineChart – PMV and PPD</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Radar chart - Primary Energy Breakdown</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-figure">Example Figure</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-Visualizations.Radar.Radar">Radar Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Visualizations.Radar">Package contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ScatterPlot.html">Scatter Plot - Heating &amp; Cooling vs Outdoor Temperature</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Data Visualizations</a></li>
+      <li class="breadcrumb-item active">Radar chart - Primary Energy Breakdown</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Radar.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="radar-chart-primary-energy-breakdown">
+<h1>Radar chart - Primary Energy Breakdown<a class="headerlink" href="#radar-chart-primary-energy-breakdown" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The Radar Chart visualizes the <strong>primary energy consumption profile</strong> of each building space.
+It highlights the relative contribution of different energy categories (heating, cooling, lighting, equipment, etc.) and allows comparing the energy signature of spaces through a combined <strong>polar radar plot + bar chart</strong> layout.</p>
+<p>This representation helps identify dominant energy uses, imbalances between spaces, and potential targets for optimization.</p>
+</section>
+<section id="example-figure">
+<h2>Example Figure<a class="headerlink" href="#example-figure" title="Link to this heading"></a></h2>
+<img alt="Radar chart visualization" class="align-center" src="_images/4.Radar.jpg" />
+<section id="module-Visualizations.Radar.Radar">
+<span id="radar-module"></span><h3>Radar Module<a class="headerlink" href="#module-Visualizations.Radar.Radar" title="Link to this heading"></a></h3>
+<section id="radar-chart-visualizations">
+<h4>Radar Chart Visualizations<a class="headerlink" href="#radar-chart-visualizations" title="Link to this heading"></a></h4>
+<p>This module implements the <code class="docutils literal notranslate"><span class="pre">rdr</span></code> class used in the BEPVis project to generate
+one radar chart per building zone, with an associated bar chart providing
+a secondary view of the same indicators.</p>
+<dl class="simple">
+<dt>Each zone receives:</dt><dd><ul class="simple">
+<li><p>A radar chart (primary energy contributions per category)</p></li>
+<li><p>A bar chart (absolute values per category)</p></li>
+</ul>
+</dd>
+<dt>The radar displays:</dt><dd><ul class="simple">
+<li><p>A set of unfilled traces (one per zone) for comparison</p></li>
+<li><p>A filled trace highlighting the active zone</p></li>
+<li><p>Hover information for the highlighted zone</p></li>
+<li><p>Colors assigned automatically using the Glasbey palette</p></li>
+</ul>
+</dd>
+<dt>The bar chart displays:</dt><dd><ul class="simple">
+<li><p>The absolute primary energy consumption for the selected zone</p></li>
+<li><p>Consistent colors with the radar filled trace</p></li>
+</ul>
+</dd>
+<dt>The layout is produced using Plotly, with 2 rows:</dt><dd><p>Row 1: Radar charts (polar)
+Row 2: Bar charts</p>
+</dd>
+</dl>
+<section id="input-format">
+<h5>Input Format<a class="headerlink" href="#input-format" title="Link to this heading"></a></h5>
+<p>The Excel file must contain:</p>
+<blockquote>
+<div><p>Zone | Category1 | Category2 | Category3 | …</p>
+</div></blockquote>
+<p>Each row represents one space/zone.
+Every column after “Zone” is a primary energy category.</p>
+<p>Authors: Ofelia Vera-Piazzini, Massimiliano Scarpa (Università Iuav di Venezia)
+License: MIT</p>
+</section>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="Visualizations.Radar.Radar.rdr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Visualizations.Radar.Radar.</span></span><span class="sig-name descname"><span class="pre">rdr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_file_pathandname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filesave_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Visualizations/Radar/Radar.html#rdr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualizations.Radar.Radar.rdr" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Generate a radar chart + bar chart for each zone in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_file_pathandname</strong> (<em>str</em>) – <p>Path to an Excel file.
+Columns must include:</p>
+<blockquote>
+<div><ul>
+<li><p>’Zone’ (string)</p></li>
+<li><p>All other columns are radar categories.</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>filesave_name</strong> (<em>str</em>) – Output filename (HTML) without extension.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The function generates one radar per zone, aligned horizontally.</p></li>
+<li><p>Each radar has a filled line for the selected zone, and thin lines for
+all other zones for comparison.</p></li>
+<li><p>A bar chart below each radar shows the absolute values per category.</p></li>
+</ul>
+</dd></dl>
+
+</section>
+</section>
+<section id="module-Visualizations.Radar">
+<span id="package-contents"></span><h2>Package contents<a class="headerlink" href="#module-Visualizations.Radar" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="LineChart.html" class="btn btn-neutral float-left" title="LineChart – PMV and PPD" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ScatterPlot.html" class="btn btn-neutral float-right" title="Scatter Plot - Heating &amp; Cooling vs Outdoor Temperature" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

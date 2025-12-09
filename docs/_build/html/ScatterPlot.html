@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scatter Plot - Heating &amp; Cooling vs Outdoor Temperature &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=795c39da"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="References" href="ref.html" />
+    <link rel="prev" title="Radar chart - Primary Energy Breakdown" href="Radar.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">BEPVis Data Visualization Tool</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Data Visualizations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="GainsAndLosses.html">Bar chart - Gains &amp; Lossess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Heatmap.html">Heatmap Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LineChart.html">LineChart – PMV and PPD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Radar.html">Radar chart - Primary Energy Breakdown</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Scatter Plot - Heating &amp; Cooling vs Outdoor Temperature</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-figure">Example Figure</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-Visualizations.ScatterPlot.ScatterPlot">Scatter Plot Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Visualizations.ScatterPlot">Package Contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Data Visualizations</a></li>
+      <li class="breadcrumb-item active">Scatter Plot - Heating &amp; Cooling vs Outdoor Temperature</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/ScatterPlot.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="scatter-plot-heating-cooling-vs-outdoor-temperature">
+<h1>Scatter Plot - Heating &amp; Cooling vs Outdoor Temperature<a class="headerlink" href="#scatter-plot-heating-cooling-vs-outdoor-temperature" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The Scatter Plot module visualizes the relationship between <strong>outdoor temperature</strong> and the building’s
+<strong>hourly heating and cooling ILAS rates (W/m²)</strong> for each zone.</p>
+<p>This representation helps to:</p>
+<ul class="simple">
+<li><p>identify system behaviour at different temperature ranges,</p></li>
+<li><p>detect overheating/overcooling trends,</p></li>
+<li><p>evaluate HVAC response patterns throughout the day,</p></li>
+<li><p>compare performance during different time-of-day intervals (0–8, 8–19, 19–24),</p></li>
+<li><p>assess linear correlations via regression trend lines.</p></li>
+</ul>
+<p>Two side-by-side scatter plots are generated:</p>
+<ul class="simple">
+<li><p><strong>Heating Load vs Outdoor Temperature</strong></p></li>
+<li><p><strong>Cooling Load vs Outdoor Temperature</strong></p></li>
+</ul>
+<p>Each includes color-coded hour ranges, optional trend lines, hover details, and automatic axis scaling.</p>
+</section>
+<section id="example-figure">
+<h2>Example Figure<a class="headerlink" href="#example-figure" title="Link to this heading"></a></h2>
+<img alt="Scatter plot visualization" class="align-center" src="_images/5.Scatter.jpg" />
+<section id="module-Visualizations.ScatterPlot.ScatterPlot">
+<span id="scatter-plot-module"></span><h3>Scatter Plot Module<a class="headerlink" href="#module-Visualizations.ScatterPlot.ScatterPlot" title="Link to this heading"></a></h3>
+<section id="scatter-plot-visualization-heating-cooling-vs-outdoor-temperature">
+<h4>Scatter Plot Visualization (Heating &amp; Cooling vs Outdoor Temperature)<a class="headerlink" href="#scatter-plot-visualization-heating-cooling-vs-outdoor-temperature" title="Link to this heading"></a></h4>
+<p>This module implements the <code class="docutils literal notranslate"><span class="pre">scttr_plt</span></code> class for generating two scatter
+plots: one for heating loads, one for cooling loads, both plotted against
+outdoor temperature.</p>
+<dl class="simple">
+<dt>Each plot shows:</dt><dd><ul class="simple">
+<li><p>hourly values of Heating or Cooling Rate (W/m²)</p></li>
+<li><p>points grouped by time-of-day ranges (0–8, 8–19, 19–24)</p></li>
+<li><p>a global regression line</p></li>
+<li><p>individual regression lines per time range</p></li>
+<li><p>hover information</p></li>
+<li><p>legends with interactive visibility</p></li>
+</ul>
+</dd>
+</dl>
+<p>The two plots are displayed side by side using Bokeh’s <code class="docutils literal notranslate"><span class="pre">gridplot</span></code>.</p>
+<section id="dataset-requirements">
+<h5>Dataset Requirements<a class="headerlink" href="#dataset-requirements" title="Link to this heading"></a></h5>
+<p>The Excel file must contain the following columns:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Outdoor_Temperature</p></li>
+<li><p>Zone_ILAS_HeatingRate</p></li>
+<li><p>Zone_ILAS_CoolingRate</p></li>
+<li><p>Date/Time (string “YYYY/MM/DD HH:MM”)</p></li>
+</ul>
+</div></blockquote>
+<p>Authors: Ofelia Vera-Piazzini, Massimiliano Scarpa (Università Iuav di Venezia)
+License: MIT</p>
+</section>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="Visualizations.ScatterPlot.ScatterPlot.scttr_plt">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Visualizations.ScatterPlot.ScatterPlot.</span></span><span class="sig-name descname"><span class="pre">scttr_plt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_file_pathandname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zone_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_max_heating</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_max_cooling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filesave_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Visualizations/ScatterPlot/ScatterPlot.html#scttr_plt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualizations.ScatterPlot.ScatterPlot.scttr_plt" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Create scatter plots of Heating/Cooling vs Outdoor Temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_file_pathandname</strong> (<em>str</em>) – Path to the Excel file containing the required columns.</p></li>
+<li><p><strong>zone_name</strong> (<em>str</em>) – Name of the zone for use in the plot title.</p></li>
+<li><p><strong>value_max_heating</strong> (<em>float</em>) – Maximum expected heating rate, used to scale the Y axis.</p></li>
+<li><p><strong>value_max_cooling</strong> (<em>float</em>) – Maximum expected cooling rate, used to scale the Y axis.</p></li>
+<li><p><strong>filesave_name</strong> (<em>str</em>) – Base name of the output HTML file.</p></li>
+<li><p><strong>Generates</strong></p></li>
+<li><p><strong>---------</strong></p></li>
+<li><p><strong>plots</strong> (<em>An HTML file with two Bokeh scatter</em>) – <ul>
+<li><p>Heating vs Outdoor Temperature</p></li>
+<li><p>Cooling vs Outdoor Temperature</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="module-Visualizations.ScatterPlot">
+<span id="package-contents"></span><h2>Package Contents<a class="headerlink" href="#module-Visualizations.ScatterPlot" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Radar.html" class="btn btn-neutral float-left" title="Radar chart - Primary Energy Breakdown" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ref.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

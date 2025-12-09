@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizations.ScatterPlot.ScatterPlot &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=795c39da"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">BEPVis Data Visualization Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Data Visualizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Visualizations.ScatterPlot.ScatterPlot</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Visualizations.ScatterPlot.ScatterPlot</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Scatter Plot Visualization (Heating &amp; Cooling vs Outdoor Temperature)</span>
+<span class="sd">====================================================================</span>
+
+<span class="sd">This module implements the ``scttr_plt`` class for generating two scatter</span>
+<span class="sd">plots: one for heating loads, one for cooling loads, both plotted against</span>
+<span class="sd">outdoor temperature.</span>
+
+<span class="sd">Each plot shows:</span>
+<span class="sd">    - hourly values of Heating or Cooling Rate (W/m²)</span>
+<span class="sd">    - points grouped by time-of-day ranges (0–8, 8–19, 19–24)</span>
+<span class="sd">    - a global regression line</span>
+<span class="sd">    - individual regression lines per time range</span>
+<span class="sd">    - hover information</span>
+<span class="sd">    - legends with interactive visibility</span>
+
+<span class="sd">The two plots are displayed side by side using Bokeh&#39;s ``gridplot``.</span>
+
+<span class="sd">Dataset Requirements</span>
+<span class="sd">--------------------</span>
+<span class="sd">The Excel file must contain the following columns:</span>
+
+<span class="sd">    - Outdoor_Temperature</span>
+<span class="sd">    - Zone_ILAS_HeatingRate</span>
+<span class="sd">    - Zone_ILAS_CoolingRate</span>
+<span class="sd">    - Date/Time (string &quot;YYYY/MM/DD HH:MM&quot;)</span>
+
+<span class="sd">Authors: Ofelia Vera-Piazzini, Massimiliano Scarpa (Università Iuav di Venezia)  </span>
+<span class="sd">License: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">figure</span><span class="p">,</span> <span class="n">show</span>
+<span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="kn">import</span> <span class="n">output_file</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">linregress</span>
+<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">viridis</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="kn">import</span> <span class="n">gridplot</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">HoverTool</span><span class="p">,</span> <span class="n">Legend</span><span class="p">,</span> <span class="n">Range1d</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="c1"># ============================================================================</span>
+<span class="c1"># SCATTER PLOT CLASS</span>
+<span class="c1"># ============================================================================</span>
+<div class="viewcode-block" id="scttr_plt">
+<a class="viewcode-back" href="../../../ScatterPlot.html#Visualizations.ScatterPlot.ScatterPlot.scttr_plt">[docs]</a>
+<span class="k">class</span> <span class="nc">scttr_plt</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create scatter plots of Heating/Cooling vs Outdoor Temperature.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source_file_pathandname : str</span>
+<span class="sd">        Path to the Excel file containing the required columns.</span>
+<span class="sd">    zone_name : str</span>
+<span class="sd">        Name of the zone for use in the plot title.</span>
+<span class="sd">    value_max_heating : float</span>
+<span class="sd">        Maximum expected heating rate, used to scale the Y axis.</span>
+<span class="sd">    value_max_cooling : float</span>
+<span class="sd">        Maximum expected cooling rate, used to scale the Y axis.</span>
+<span class="sd">    filesave_name : str</span>
+<span class="sd">        Base name of the output HTML file.</span>
+
+<span class="sd">    Generates</span>
+<span class="sd">    ---------</span>
+<span class="sd">    An HTML file with two Bokeh scatter plots:</span>
+<span class="sd">        - Heating vs Outdoor Temperature</span>
+<span class="sd">        - Cooling vs Outdoor Temperature</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_file_pathandname</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">zone_name</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">value_max_heating</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">value_max_cooling</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">filesave_name</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">):</span>
+        
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># LOAD DATA</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">source_file_pathandname</span><span class="p">)</span>
+
+        <span class="c1"># Determine the maximum value among heating and cooling rates for y-axis scaling</span>
+        <span class="n">s_y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Zone_ILAS_HeatingRate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">s_y</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Zone_ILAS_CoolingRate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">value_max_heating</span><span class="p">,</span> <span class="n">value_max_cooling</span><span class="p">)</span><span class="o">/</span><span class="mi">50</span><span class="p">)</span><span class="o">*</span><span class="mi">50</span>
+
+        <span class="c1"># Extract outdoor temperature and heating rate columns</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Outdoor_Temperature&#39;</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Zone_ILAS_HeatingRate&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Extract the hour from the &#39;Date/Time&#39; column for time-of-day filtering</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Date/Time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">()</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># HEATING RATE PLOT</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+        
+        <span class="c1"># Create the heating rate scatter plot</span>
+        <span class="n">p_h</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Total Heating Rate (W/m2) vs Outdoor Temperature (°C) - &quot;</span> <span class="o">+</span> <span class="n">zone_name</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,examine,help&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Define colors palette for different time-of-day ranges</span>
+        <span class="n">num_ranges</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="n">viridis</span><span class="p">(</span><span class="n">num_ranges</span><span class="p">))</span>
+
+        <span class="c1"># Containers for storing glyphs (optional for extensions)</span>
+        <span class="n">scatter_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">trend_lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Add the overall (general) trend line for heating</span>
+        <span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">r_value</span><span class="p">,</span> <span class="n">p_value</span><span class="p">,</span> <span class="n">std_err</span> <span class="o">=</span> <span class="n">linregress</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">general_trend_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)])</span>
+        <span class="n">general_trend_y</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">general_trend_x</span>
+        <span class="n">general_trend_line</span> <span class="o">=</span> <span class="n">p_h</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">general_trend_x</span><span class="p">,</span> <span class="n">general_trend_y</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="s2">&quot;General Trend Line&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Plot scatter points and trend lines by time-of-day intervals (0–8, 8–19, 19–24)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hour_range</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">19</span><span class="p">),</span> <span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">24</span><span class="p">)]):</span>
+            <span class="c1"># Filter data by hour range</span>
+            <span class="n">x_range</span> <span class="o">=</span> <span class="n">x</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="n">y_range</span> <span class="o">=</span> <span class="n">y</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            
+            <span class="c1"># Scatter plot for the current time range</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+            <span class="n">scatter_item</span> <span class="o">=</span> <span class="n">p_h</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Time: </span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">scatter_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scatter_item</span><span class="p">)</span>
+            
+            <span class="c1"># Add linear regression trend line if enough data points</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_range</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">r_value</span><span class="p">,</span> <span class="n">p_value</span><span class="p">,</span> <span class="n">std_err</span> <span class="o">=</span> <span class="n">linregress</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span><span class="p">)</span>
+                <span class="n">trend_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">x_range</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x_range</span><span class="p">)])</span>
+                <span class="n">trend_y</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">trend_x</span>
+                
+                <span class="n">trend_line</span> <span class="o">=</span> <span class="n">p_h</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">trend_x</span><span class="p">,</span> <span class="n">trend_y</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Time: </span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> - Trend Line&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">trend_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trend_line</span><span class="p">)</span>
+
+        <span class="c1"># Axis labeling for heating plot</span>
+        <span class="n">p_h</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Hourly Outdoor Temperature [°C]&#39;</span>
+        <span class="n">p_h</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Hourly Total Heating Rate [W/m2]&#39;</span>
+        <span class="n">p_h</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">p_h</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span>  <span class="n">y_max</span>
+
+        <span class="c1"># Customize legend behavior for heating plot</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="n">p_h</span><span class="o">.</span><span class="n">legend</span>
+        <span class="n">p_h</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Hour Range&quot;</span>
+        <span class="n">p_h</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;top_right&quot;</span>
+        <span class="n">p_h</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">click_policy</span> <span class="o">=</span> <span class="s2">&quot;hide&quot;</span>
+        <span class="n">legend</span><span class="o">.</span><span class="n">label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;9pt&quot;</span>
+        <span class="n">legend</span><span class="o">.</span><span class="n">spacing</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Add hover tool for heating plot</span>
+        <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span><span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Outdoor Temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;@x</span><span class="si">{0.0}</span><span class="s2"> °C&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Heating Rate&quot;</span><span class="p">,</span> <span class="s2">&quot;@y</span><span class="si">{0}</span><span class="s2"> W/m2&quot;</span><span class="p">)])</span>
+        <span class="n">p_h</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># COOLING RATE PLOT (same logic)</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+        
+        <span class="c1"># Repeat the process for the cooling rate plot</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Outdoor_Temperature&#39;</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Zone_ILAS_CoolingRate&#39;</span><span class="p">]</span>
+        
+        <span class="c1"># Create the cooling rate scatter plot</span>
+        <span class="n">p_c</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Total Cooling Rate (W/m2) vs Outdoor Temperature (°C) - &quot;</span> <span class="o">+</span> <span class="n">zone_name</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,examine,help&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Define color palette for different time-of-day ranges</span>
+        <span class="n">num_ranges</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="n">viridis</span><span class="p">(</span><span class="n">num_ranges</span><span class="p">))</span>
+
+        <span class="c1"># Containers for storing glyphs (optional for extensions)</span>
+        <span class="n">scatter_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">trend_lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Add the overall (general) trend line for cooling</span>
+        <span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">r_value</span><span class="p">,</span> <span class="n">p_value</span><span class="p">,</span> <span class="n">std_err</span> <span class="o">=</span> <span class="n">linregress</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">general_trend_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">)])</span>
+        <span class="n">general_trend_y</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">general_trend_x</span>
+        <span class="n">general_trend_line</span> <span class="o">=</span> <span class="n">p_c</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">general_trend_x</span><span class="p">,</span> <span class="n">general_trend_y</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="s2">&quot;General Trend Line&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Plot scatter points and trend lines by time-of-day intervals (0–8, 8–19, 19–24)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hour_range</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">19</span><span class="p">),</span> <span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">24</span><span class="p">)]):</span>
+            <span class="c1"># Filter data by hour range</span>
+            <span class="n">x_range</span> <span class="o">=</span> <span class="n">x</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="n">y_range</span> <span class="o">=</span> <span class="n">y</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            
+            <span class="c1"># Scatter plot for the current time range</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+            <span class="n">scatter_item</span> <span class="o">=</span> <span class="n">p_c</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Time: </span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">scatter_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scatter_item</span><span class="p">)</span>
+            
+            <span class="c1"># Add linear regression trend line if enough data points</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_range</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">r_value</span><span class="p">,</span> <span class="n">p_value</span><span class="p">,</span> <span class="n">std_err</span> <span class="o">=</span> <span class="n">linregress</span><span class="p">(</span><span class="n">x_range</span><span class="p">,</span> <span class="n">y_range</span><span class="p">)</span>
+                <span class="n">trend_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">x_range</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x_range</span><span class="p">)])</span>
+                <span class="n">trend_y</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">trend_x</span>
+                
+                <span class="n">trend_line</span> <span class="o">=</span> <span class="n">p_c</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">trend_x</span><span class="p">,</span> <span class="n">trend_y</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Time: </span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">hour_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> - Trend Line&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">trend_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trend_line</span><span class="p">)</span>
+
+        <span class="c1"># Axis labeling for cooling plot</span>
+        <span class="n">p_c</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Hourly Outdoor Temperature [°C]&#39;</span>
+        <span class="n">p_c</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Hourly Total Cooling Rate [W/m2]&#39;</span>
+        <span class="n">p_c</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">p_c</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span>  <span class="n">y_max</span>
+
+        <span class="c1"># Customize legend behavior for cooling plot</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="n">p_c</span><span class="o">.</span><span class="n">legend</span>
+        <span class="n">p_c</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Hour Range&quot;</span>
+        <span class="n">p_c</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;top_right&quot;</span>
+        <span class="n">p_c</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">click_policy</span> <span class="o">=</span> <span class="s2">&quot;hide&quot;</span>
+        <span class="n">legend</span><span class="o">.</span><span class="n">label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;9pt&quot;</span>
+        <span class="n">legend</span><span class="o">.</span><span class="n">spacing</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Add hover tool for cooling plot</span>
+        <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span><span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Outdoor Temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;@x</span><span class="si">{0.0}</span><span class="s2"> °C&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Cooling Rate&quot;</span><span class="p">,</span> <span class="s2">&quot;@y</span><span class="si">{0}</span><span class="s2"> W/m2&quot;</span><span class="p">)])</span>
+        <span class="n">p_c</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># LAYOUT &amp; OUTPUT</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">gridplot</span><span class="p">([[</span><span class="n">p_h</span><span class="p">,</span> <span class="n">p_c</span><span class="p">]])</span>
+        <span class="n">output_file</span><span class="p">(</span><span class="n">filesave_name</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span></div>
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

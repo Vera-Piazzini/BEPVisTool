@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizations.Heatmap.Heatmap &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=795c39da"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">BEPVis Data Visualization Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Data Visualizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">Visualizations.Heatmap.Heatmap</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for Visualizations.Heatmap.Heatmap</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Hourly Heatmap Visualizations</span>
+<span class="sd">=============================</span>
+
+<span class="sd">This module implements the ``htmp`` class, which generates two coordinated</span>
+<span class="sd">heatmaps with Bokeh:</span>
+
+<span class="sd">1. **Main Heatmap**  </span>
+<span class="sd">   Displays hourly values (e.g., temperature, RH, CO₂) for all days in a year.  </span>
+
+<span class="sd">2. **Thermal Comfort / Anomaly Map**  </span>
+<span class="sd">   Highlights hours inside or outside an admissible comfort range.</span>
+
+<span class="sd">The figure also includes:</span>
+<span class="sd">- A colorbar with tick formatting</span>
+<span class="sd">- A sidebar with occurrence percentages for each color range</span>
+<span class="sd">- A second bar chart showing % of hours inside/outside the comfort range</span>
+<span class="sd">- Linked brushing between heatmaps</span>
+
+<span class="sd">The class is general and can be reused for any hourly environmental dataset</span>
+<span class="sd">with columns: ``Date``, ``Hour``, ``Value``.</span>
+
+<span class="sd">Designed for the BEPVis project.</span>
+
+<span class="sd">Author: Ofelia Vera-Piazzini, Massimiliano Scarpa (Università Iuav di Venezia)</span>
+<span class="sd">License: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="kn">import</span> <span class="n">figure</span><span class="p">,</span> <span class="n">show</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">figure</span>
+<span class="kn">from</span> <span class="nn">bokeh.transform</span> <span class="kn">import</span> <span class="n">linear_cmap</span><span class="p">,</span> <span class="n">factor_cmap</span>
+<span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">CustomJSTickFormatter</span><span class="p">,</span> <span class="n">FixedTicker</span><span class="p">,</span> <span class="n">Range1d</span><span class="p">,</span> <span class="n">BoxSelectTool</span><span class="p">,</span> <span class="n">PrintfTickFormatter</span><span class="p">,</span> <span class="n">LinearColorMapper</span><span class="p">,</span> <span class="n">CustomJSTickFormatter</span><span class="p">,</span> <span class="n">HoverTool</span><span class="p">,</span> <span class="n">ColorBar</span><span class="p">,</span> <span class="n">FixedTicker</span><span class="p">,</span> <span class="n">ColumnDataSource</span><span class="p">,</span> <span class="n">LabelSet</span><span class="p">,</span> <span class="n">SaveTool</span><span class="p">,</span> <span class="n">ResetTool</span><span class="p">,</span> <span class="n">WheelZoomTool</span><span class="p">,</span> <span class="n">PanTool</span><span class="p">,</span> <span class="n">BoxZoomTool</span><span class="p">,</span> <span class="n">BoxSelectTool</span>
+<span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="kn">import</span> <span class="n">column</span><span class="p">,</span> <span class="n">gridplot</span>
+<span class="kn">from</span> <span class="nn">bokeh.palettes</span> <span class="kn">import</span> <span class="n">Turbo256</span>
+
+<span class="c1"># ======================</span>
+<span class="c1"># CLASS DEFINITION</span>
+<span class="c1"># ======================</span>
+<div class="viewcode-block" id="htmp">
+<a class="viewcode-back" href="../../../Heatmap.html#Visualizations.Heatmap.Heatmap.htmp">[docs]</a>
+<span class="k">class</span> <span class="nc">htmp</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate an hourly environmental heatmap and anomaly map.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        Must contain the columns: ``[&#39;Date&#39;, &#39;Hour&#39;, &#39;Value&#39;]``  </span>
+<span class="sd">        - ``Date`` : string or datetime  </span>
+<span class="sd">        - ``Hour`` : 0–23  </span>
+<span class="sd">        - ``Value``: environmental variable to visualize</span>
+<span class="sd">    source_file_pathandname : str</span>
+<span class="sd">        Name of the source dataset (optional label).</span>
+<span class="sd">    zone_name : str</span>
+<span class="sd">        Name of the room or zone.</span>
+<span class="sd">    parameter_title : str</span>
+<span class="sd">        Label of the environmental variable (e.g. &quot;Temperature&quot;).</span>
+<span class="sd">    parameter_unit : str</span>
+<span class="sd">        Unit of the variable (e.g. &quot;°C&quot;, &quot;%&quot;).</span>
+<span class="sd">    ns_color : int</span>
+<span class="sd">        Number of colors in the palette (12 recommended).</span>
+<span class="sd">    s_limit : list</span>
+<span class="sd">        [min_value, max_value] for the main heatmap color scale.  </span>
+<span class="sd">        If values are strings, limits are computed automatically.</span>
+<span class="sd">    s_limit_best : list</span>
+<span class="sd">        [min_value, max_value] of admissible or comfort range.</span>
+<span class="sd">    filesave_name : str</span>
+<span class="sd">        Output filename (HTML).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Two heatmaps are generated:</span>
+<span class="sd">        * full-range value heatmap</span>
+<span class="sd">        * anomaly heatmap based on comfort limits</span>
+<span class="sd">    - Colorbars and occurrence plots are automatically created.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">source_file_pathandname</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">zone_name</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">parameter_title</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">parameter_unit</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">ns_color</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">s_limit</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">],</span> <span class="n">s_limit_best</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">],</span> <span class="n">filesave_name</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">):</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># 1. PREPARE AND VALIDATE INPUT DATA</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="c1"># Extract value list for limit auto-detection</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        
+        <span class="c1"># Compute limits if user left &quot;?&quot;</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s_limit</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">s_limit</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">s_limit</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s_limit_best</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">s_limit_best</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">s_limit_best</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="c1"># Create a grid: [hours x days], with values</span>
+        <span class="n">hours</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Calculate the day number of the year for each date</span>
+        <span class="n">day_of_year</span> <span class="o">=</span> <span class="n">dates</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofyear</span>
+
+        <span class="c1"># Create a list of unique hours, days, and months</span>
+        <span class="n">unique_hours</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">unique_days</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">day_of_year</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># 2. GRID CONSTRUCTION FOR HEATMAP</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="c1"># Create a grid of values for each hour and day</span>
+        <span class="n">values_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_hours</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_days</span><span class="p">)))</span>
+
+        <span class="c1"># Loop over unique hours</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hour</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_hours</span><span class="p">):</span>
+            <span class="c1"># Loop over unique days</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">day</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_days</span><span class="p">):</span>
+                <span class="c1"># Extract value for the current hour and day</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">hour</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">day_of_year</span> <span class="o">==</span> <span class="n">day</span><span class="p">)][</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+                
+                <span class="c1"># Check if value data exists</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Assign the first value to the corresponding grid cell</span>
+                    <span class="n">values_grid</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># 3. COLOR PALETTE</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="c1"># Define the color palette</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">Turbo256</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">Turbo256</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="mi">256</span><span class="o">/</span><span class="n">ns_color</span><span class="p">)))][:</span><span class="n">ns_color</span><span class="p">]</span>
+        <span class="n">custom_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#733B9E&quot;</span><span class="p">,</span> <span class="s2">&quot;#18447C&quot;</span><span class="p">,</span> <span class="s2">&quot;#4980B9&quot;</span><span class="p">,</span> <span class="s2">&quot;#86B1E4&quot;</span><span class="p">,</span> <span class="s2">&quot;#BED7EC&quot;</span><span class="p">,</span> <span class="s2">&quot;#E0F3F8&quot;</span><span class="p">,</span> <span class="s2">&quot;#FFEE12&quot;</span><span class="p">,</span> <span class="s2">&quot;#FFB901&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF9643&quot;</span><span class="p">,</span> <span class="s2">&quot;#ED6F08&quot;</span><span class="p">,</span> <span class="s2">&quot;#EA0112&quot;</span><span class="p">,</span> <span class="s2">&quot;#A50026&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">ns_color</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">custom_colors</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">colors</span>
+        
+        <span class="c1"># Define axis ranges</span>
+        <span class="n">x_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">365</span><span class="p">)</span> <span class="c1"># Adjust x_range to accommodate all 365 days</span>
+        <span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_hours</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">#23 hours</span>
+
+        <span class="c1"># =====================================================================</span>
+        <span class="c1"># MAIN HEATMAP</span>
+        <span class="c1"># =====================================================================</span>
+
+        <span class="c1"># Define month names</span>
+        <span class="n">month_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Jan&#39;</span><span class="p">,</span> <span class="s1">&#39;Feb&#39;</span><span class="p">,</span> <span class="s1">&#39;Mar&#39;</span><span class="p">,</span> <span class="s1">&#39;Apr&#39;</span><span class="p">,</span> <span class="s1">&#39;May&#39;</span><span class="p">,</span> <span class="s1">&#39;Jun&#39;</span><span class="p">,</span> <span class="s1">&#39;Jul&#39;</span><span class="p">,</span> <span class="s1">&#39;Aug&#39;</span><span class="p">,</span> <span class="s1">&#39;Sep&#39;</span><span class="p">,</span> <span class="s1">&#39;Oct&#39;</span><span class="p">,</span> <span class="s1">&#39;Nov&#39;</span><span class="p">,</span> <span class="s1">&#39;Dec&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Create HoverTool instance with tooltips</span>
+        <span class="n">hover_tool</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span>
+            <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Day&quot;</span><span class="p">,</span> <span class="s2">&quot;@x</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Hour&quot;</span><span class="p">,</span> <span class="s2">&quot;@y</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">parameter_title</span><span class="p">,</span> <span class="s2">&quot;@image</span><span class="si">{0.0}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">parameter_unit</span><span class="p">)])</span>
+
+        <span class="c1"># Create the figure</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Hourly &#39;</span> <span class="o">+</span> <span class="n">parameter_title</span> <span class="o">+</span> <span class="s1">&#39; - &#39;</span> <span class="o">+</span> <span class="n">zone_name</span><span class="p">,</span>
+                <span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span>  
+                <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
+                <span class="n">x_axis_location</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span>
+                <span class="n">x_axis_label</span><span class="o">=</span><span class="s2">&quot;Days&quot;</span><span class="p">,</span>
+                <span class="n">y_axis_label</span><span class="o">=</span><span class="s2">&quot;Hours&quot;</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;save&quot;</span><span class="p">,</span> <span class="s2">&quot;pan&quot;</span><span class="p">,</span> <span class="s2">&quot;box_zoom&quot;</span><span class="p">,</span> <span class="s2">&quot;reset&quot;</span><span class="p">,</span> <span class="s2">&quot;wheel_zoom&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Add hover tool to the first figure</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover_tool</span><span class="p">)</span>
+
+        <span class="c1"># Create the main ticks for the firat day of each month</span>
+        <span class="n">minor_tick</span> <span class="o">=</span> <span class="p">[</span><span class="mi">31</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">]</span> <span class="c1"># Days in each month</span>
+        <span class="n">main_ticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">minor_tick</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># Start of each month (e.g., 1, 32, 60...)</span>
+
+        <span class="c1"># Create intermediate ticks (3 weeks within each month)</span>
+        <span class="n">week_ticks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">days</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">minor_tick</span><span class="p">):</span>
+            <span class="n">start_of_month</span> <span class="o">=</span> <span class="n">main_ticks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">weeks_in_month</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start_of_month</span><span class="p">,</span> <span class="n">start_of_month</span> <span class="o">+</span> <span class="n">days</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">week_ticks</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">weeks_in_month</span><span class="p">)</span>
+
+
+        <span class="c1"># Configure the main ticker</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">ticker</span> <span class="o">=</span> <span class="n">FixedTicker</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">main_ticks</span><span class="p">)</span>
+
+        <span class="c1"># Combine main and intermediate ticks</span>
+        <span class="n">all_ticks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">main_ticks</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">week_ticks</span><span class="p">))</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">ticker</span> <span class="o">=</span> <span class="n">FixedTicker</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">all_ticks</span><span class="p">)</span>
+
+        <span class="c1"># Customize the tick format</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">CustomJSTickFormatter</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            const months = [&#39;Jan&#39;, &#39;Feb&#39;, &#39;Mar&#39;, &#39;Apr&#39;, &#39;May&#39;, &#39;Jun&#39;, &#39;Jul&#39;, &#39;Aug&#39;, &#39;Sep&#39;, &#39;Oct&#39;, &#39;Nov&#39;, &#39;Dec&#39;];</span>
+<span class="s2">            const month_starts = [1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];</span>
+<span class="s2">            </span>
+<span class="s2">            for (let i = 0; i &lt; month_starts.length; i++) {</span>
+<span class="s2">                if (Math.abs(tick - month_starts[i]) &lt; 1) {</span>
+<span class="s2">                    return months[i];</span>
+<span class="s2">                }</span>
+<span class="s2">            }</span>
+<span class="s2">            return &#39;&#39;;</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">)</span>
+
+        
+        <span class="n">p</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">axis_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="c1"># Configuration of minor ticks</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_line_color</span> <span class="o">=</span> <span class="s1">&#39;Black&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_line_width</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_in</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_out</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="c1"># Configuration of major ticks</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">axis_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="s1">&#39;Black&#39;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;9px&quot;</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_label_standoff</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="s2">&quot;horizontal&quot;</span>
+
+        <span class="c1"># Create color mapper</span>
+        <span class="n">mapper</span> <span class="o">=</span> <span class="n">linear_cmap</span><span class="p">(</span><span class="n">field_name</span><span class="o">=</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="n">palette</span> <span class="o">=</span> <span class="n">colors</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="n">s_limit</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">high</span><span class="o">=</span><span class="n">s_limit</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Create the heatmap</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">day_of_year</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">hours</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">values</span><span class="p">},</span>
+            <span class="n">fill_color</span><span class="o">=</span><span class="n">mapper</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># Create the ticker locations</span>
+        <span class="n">ticker_locs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">s_limit</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s_limit</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># COLORBAR</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="c1"># Create color bar with fixed ticker locations</span>
+        <span class="n">ns_digit</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">ns_digit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">abs</span><span class="p">((</span><span class="n">s_limit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">s_limit</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">ns_color</span><span class="p">))))</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">ticker_locs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ns_digit</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ticker_locs</span><span class="p">]</span>
+        <span class="n">color_bar</span> <span class="o">=</span> <span class="n">ColorBar</span><span class="p">(</span><span class="n">color_mapper</span><span class="o">=</span><span class="n">mapper</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">],</span>
+                            <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
+                            <span class="n">title</span><span class="o">=</span> <span class="n">parameter_title</span> <span class="o">+</span> <span class="s1">&#39;[&#39;</span> <span class="o">+</span> <span class="n">parameter_unit</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span>
+                            <span class="n">ticker</span><span class="o">=</span><span class="n">FixedTicker</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">ticker_locs</span><span class="p">),</span>
+                            <span class="n">formatter</span><span class="o">=</span><span class="n">PrintfTickFormatter</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">),</span>
+                            <span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">label_standoff</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> 
+                            <span class="n">border_line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                            <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                            <span class="n">title_standoff</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="c1"># Set the font size of the tick labels</span>
+        <span class="n">color_bar</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;7pt&quot;</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">color_bar</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">)</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># OCCURRENCE PERCENTAGE BAR (main heatmap)</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="c1"># Create occurrence percentages for each value range</span>
+        <span class="n">occurrences</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)):</span>
+            <span class="n">lower_bound</span> <span class="o">=</span> <span class="n">s_limit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="n">s_limit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">s_limit</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+            <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">s_limit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">s_limit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">s_limit</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+            <span class="n">occurrences</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lower_bound</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">upper_bound</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">values_grid</span> <span class="o">&gt;=</span> <span class="n">lower_bound</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">values_grid</span> <span class="o">&lt;</span> <span class="n">upper_bound</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">values_grid</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="c1"># Create a horizontal bar plot next to the legend</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">value_range</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">occurrences</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">occurrences</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">occurrences</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+        <span class="n">bar_plot</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">y_range</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">occurrences</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+                        <span class="n">x_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Occurrences (%)&#39;</span><span class="p">,</span>
+                        <span class="n">width</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
+                        <span class="n">height</span><span class="o">=</span><span class="mi">295</span><span class="p">,</span>
+                        <span class="n">tools</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">outline_line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># Add a horizontal bar renderer</span>
+        <span class="n">bar_plot</span><span class="o">.</span><span class="n">hbar</span><span class="p">(</span><span class="n">y</span><span class="o">=</span> <span class="s1">&#39;value_range&#39;</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="s1">&#39;occurrences&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> 
+                    <span class="n">fill_color</span><span class="o">=</span><span class="n">factor_cmap</span><span class="p">(</span><span class="s1">&#39;value_range&#39;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">factors</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">occurrences</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+
+        <span class="c1"># Round the percentage values to two decimals and add &#39;%&#39; symbol</span>
+        <span class="n">occurrences_formatted</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">occurrences</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+        <span class="n">source</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;occurrences_formatted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">occurrences_formatted</span>
+
+        <span class="c1"># Add percentage values at the end of each bar</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">LabelSet</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;occurrences&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;value_range&#39;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s1">&#39;occurrences_formatted&#39;</span><span class="p">,</span>
+                        <span class="n">x_offset</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">y_offset</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">text_align</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                        <span class="n">text_font_size</span><span class="o">=</span><span class="s1">&#39;7pt&#39;</span><span class="p">)</span>
+
+        <span class="n">bar_plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+
+        <span class="c1"># Remove grid lines and x-axis</span>
+        <span class="n">bar_plot</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">bar_plot</span><span class="o">.</span><span class="n">ygrid</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">bar_plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">bar_plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">bar_plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">bar_plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">minor_tick_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># =====================================================================</span>
+        <span class="c1"># SECOND HEATMAP — COMFORT RANGE / ANOMALY MAP</span>
+        <span class="c1"># =====================================================================</span>
+
+        <span class="c1"># Extract hour, date, and value columns</span>
+        <span class="n">hours_second_heatmap</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span>
+        <span class="n">dates_second_heatmap</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
+        <span class="n">values_second_heatmap</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Calculate the day number of the year for each date</span>
+        <span class="n">day_of_year_second_heatmap</span> <span class="o">=</span> <span class="n">dates</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofyear</span>
+
+        <span class="c1"># Create a list of unique hours, days, and months</span>
+        <span class="n">unique_hours_second_heatmap</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">unique_days_second_heatmap</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">day_of_year_second_heatmap</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+
+        <span class="c1"># Create a grid of values for each hour and day</span>
+        <span class="n">values_grid_second_heatmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_hours</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_days_second_heatmap</span><span class="p">)))</span>
+
+        <span class="c1"># Loop over unique hours</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">hour</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_hours_second_heatmap</span><span class="p">):</span>
+            <span class="c1"># Loop over unique days</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">day</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_days_second_heatmap</span><span class="p">):</span>
+                <span class="c1"># Extract value for the current hour and day</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Hour&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">hour</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">day_of_year_second_heatmap</span> <span class="o">==</span> <span class="n">day</span><span class="p">)][</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+                
+                <span class="c1"># Check if value data exists</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Assign the first value value to the corresponding grid cell</span>
+                    <span class="n">values_grid_second_heatmap</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Define month names</span>
+        <span class="n">month_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Jan&#39;</span><span class="p">,</span> <span class="s1">&#39;Feb&#39;</span><span class="p">,</span> <span class="s1">&#39;Mar&#39;</span><span class="p">,</span> <span class="s1">&#39;Apr&#39;</span><span class="p">,</span> <span class="s1">&#39;May&#39;</span><span class="p">,</span> <span class="s1">&#39;Jun&#39;</span><span class="p">,</span> <span class="s1">&#39;Jul&#39;</span><span class="p">,</span> <span class="s1">&#39;Aug&#39;</span><span class="p">,</span> <span class="s1">&#39;Sep&#39;</span><span class="p">,</span> <span class="s1">&#39;Oct&#39;</span><span class="p">,</span> <span class="s1">&#39;Nov&#39;</span><span class="p">,</span> <span class="s1">&#39;Dec&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Create HoverTool instance with tooltips</span>
+        <span class="n">hover_tool_second</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">(</span>
+            <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Day&quot;</span><span class="p">,</span> <span class="s2">&quot;@x</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Hour&quot;</span><span class="p">,</span> <span class="s2">&quot;@y</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">parameter_title</span><span class="p">,</span> <span class="s2">&quot;@image</span><span class="si">{0.0}</span><span class="s2"> °C&quot;</span><span class="p">)])</span>
+
+        <span class="n">p_second_row</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Hourly &#39;</span> <span class="o">+</span> <span class="n">parameter_title</span> <span class="o">+</span> <span class="s1">&#39; - &#39;</span> <span class="o">+</span> <span class="n">zone_name</span> <span class="o">+</span> <span class="s1">&#39; - Anomalies&#39;</span><span class="p">,</span>
+                <span class="n">x_range</span><span class="o">=</span><span class="n">x_range</span><span class="p">,</span> 
+                <span class="n">y_range</span><span class="o">=</span><span class="n">y_range</span><span class="p">,</span>
+                <span class="n">x_axis_location</span><span class="o">=</span><span class="s2">&quot;below&quot;</span><span class="p">,</span>
+                <span class="n">x_axis_label</span><span class="o">=</span><span class="s2">&quot;Days&quot;</span><span class="p">,</span>
+                <span class="n">y_axis_label</span><span class="o">=</span><span class="s2">&quot;Hours&quot;</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+                <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;save&quot;</span><span class="p">,</span> <span class="s2">&quot;pan&quot;</span><span class="p">,</span> <span class="s2">&quot;box_zoom&quot;</span><span class="p">,</span> <span class="s2">&quot;reset&quot;</span><span class="p">,</span> <span class="s2">&quot;wheel_zoom&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Add hover tool to the second figure</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover_tool_second</span><span class="p">)</span>
+
+        <span class="c1"># Configure the main ticker</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">ticker</span> <span class="o">=</span> <span class="n">FixedTicker</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">main_ticks</span><span class="p">)</span>
+
+        <span class="c1"># Combine main and intermediate ticks</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">ticker</span> <span class="o">=</span> <span class="n">FixedTicker</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">all_ticks</span><span class="p">)</span>
+
+        <span class="c1"># Customize the tick format</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">CustomJSTickFormatter</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            const months = [&#39;Jan&#39;, &#39;Feb&#39;, &#39;Mar&#39;, &#39;Apr&#39;, &#39;May&#39;, &#39;Jun&#39;, &#39;Jul&#39;, &#39;Aug&#39;, &#39;Sep&#39;, &#39;Oct&#39;, &#39;Nov&#39;, &#39;Dec&#39;];</span>
+<span class="s2">            const month_starts = [1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];</span>
+<span class="s2">            </span>
+<span class="s2">            for (let i = 0; i &lt; month_starts.length; i++) {</span>
+<span class="s2">                if (Math.abs(tick - month_starts[i]) &lt; 1) {</span>
+<span class="s2">                    return months[i];</span>
+<span class="s2">                }</span>
+<span class="s2">            }</span>
+<span class="s2">            return &#39;&#39;;</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">axis_line_color</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">xgrid</span><span class="o">.</span><span class="n">grid_line_color</span> <span class="o">=</span> <span class="s1">&#39;#FFFFFF&#39;</span>
+
+        <span class="c1"># Configuration of ticks</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_tick_line_color</span> <span class="o">=</span> <span class="s1">&#39;Black&#39;</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;9px&quot;</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">axis</span><span class="o">.</span><span class="n">major_label_standoff</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_orientation</span> <span class="o">=</span> <span class="s2">&quot;horizontal&quot;</span>
+
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_line_color</span> <span class="o">=</span> <span class="s1">&#39;Black&#39;</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_line_width</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_in</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_out</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        
+        <span class="c1"># Define custom green palette for &quot;Thermal Comfort Range&quot;</span>
+        <span class="n">green_palette</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#F7F4ED&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Create a color mapper for the &quot;Thermal Comfort Range&quot; category</span>
+        <span class="n">mapper_anomaly</span> <span class="o">=</span> <span class="n">LinearColorMapper</span><span class="p">(</span><span class="n">palette</span><span class="o">=</span><span class="n">green_palette</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="n">s_limit_best</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">high</span><span class="o">=</span><span class="n">s_limit_best</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                <span class="n">low_color</span><span class="o">=</span><span class="s1">&#39;#737373&#39;</span><span class="p">,</span> <span class="n">high_color</span><span class="o">=</span><span class="s1">&#39;#737373&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Use the custom color mapper in your plotting code</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">day_of_year_second_heatmap</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">hours_second_heatmap</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="n">values_second_heatmap</span><span class="p">},</span>
+                        <span class="n">fill_color</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="n">mapper_anomaly</span><span class="p">},</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># Add color bar</span>
+        <span class="n">ticker_locs_second_sheet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">values_grid_second_heatmap</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">values_grid_second_heatmap</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+        
+        <span class="c1"># Define the desired ticks for the color bar</span>
+        <span class="n">color_bar_ticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">s_limit_best</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s_limit_best</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+
+        <span class="c1"># Specify the desired tick locations</span>
+        <span class="n">custom_ticks</span> <span class="o">=</span> <span class="p">[</span><span class="n">s_limit_best</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">s_limit_best</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">s_limit_best</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">s_limit_best</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="c1"># ----------------------</span>
+        <span class="c1"># COLOR BAND LEGEND</span>
+        <span class="c1"># ----------------------</span>
+
+        <span class="c1"># Add color bar for the &quot;Thermal Comfort Range&quot;</span>
+        <span class="n">color_bar_thermal</span> <span class="o">=</span> <span class="n">ColorBar</span><span class="p">(</span><span class="n">color_mapper</span><span class="o">=</span><span class="n">mapper_anomaly</span><span class="p">,</span> 
+                                        <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> 
+                                        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Admitted range&#39;</span><span class="p">,</span>
+                                        <span class="n">ticker</span><span class="o">=</span><span class="n">FixedTicker</span><span class="p">(</span><span class="n">ticks</span><span class="o">=</span><span class="n">custom_ticks</span><span class="p">),</span>
+                                        <span class="n">formatter</span><span class="o">=</span><span class="n">PrintfTickFormatter</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span>
+                                        <span class="n">label_standoff</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> 
+                                        <span class="n">border_line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                                        <span class="n">padding</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                                        <span class="n">title_standoff</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+                                        
+        <span class="c1"># Set the font size of the tick labels</span>
+        <span class="n">color_bar_thermal</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;7pt&quot;</span>
+
+        <span class="c1"># Add the &quot;Thermal Comfort Range&quot; color bar to the plot</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">color_bar_thermal</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">)</span>
+
+        <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="c1"># OCCURRENCE SUMMARY BAR — COMFORT VS OUT-OF-RANGE</span>
+        <span class="c1"># ------------------------------------------------------------------</span>
+
+        <span class="c1"># Calculate percentage of hours in comfort range for each day</span>
+        <span class="n">total_occurrences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">values_grid_second_heatmap</span><span class="p">))</span>
+        <span class="n">percentage_f7f4ed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">values_grid_second_heatmap</span> <span class="o">&gt;=</span> <span class="n">s_limit_best</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">values_grid_second_heatmap</span> <span class="o">&lt;=</span> <span class="n">s_limit_best</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">/</span> <span class="n">total_occurrences</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="n">percentage_737373</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">values_grid_second_heatmap</span> <span class="o">&lt;</span> <span class="n">s_limit_best</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span> <span class="p">(</span><span class="n">values_grid_second_heatmap</span> <span class="o">&gt;</span> <span class="n">s_limit_best</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">/</span> <span class="n">total_occurrences</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="c1"># Create the vertical stacked bar chart figure</span>
+        <span class="n">stacked_bar_chart</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                                <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                                <span class="n">width</span><span class="o">=</span><span class="mi">105</span><span class="p">,</span>
+                                <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Occurrences&#39;</span><span class="p">,</span>
+                                <span class="n">toolbar_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;hover&quot;</span><span class="p">,</span>
+                                <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Category&quot;</span><span class="p">,</span> <span class="s2">&quot;@category&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Percentage&quot;</span><span class="p">,</span> <span class="s2">&quot;@percentage</span><span class="si">{0.2f}</span><span class="s2">%&quot;</span><span class="p">)])</span>
+
+        <span class="c1"># Adjust the width of the bars to make them more visible</span>
+        <span class="n">bar_width</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># Adjust the width as needed</span>
+        <span class="n">bar_offset</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># Offset to center the bars on the x-axis</span>
+
+        <span class="c1"># Define category names</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Thermal Comfort&#39;</span><span class="p">,</span> <span class="s1">&#39;Out of Range&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Define percentages</span>
+        <span class="n">percentages</span> <span class="o">=</span> <span class="p">[</span><span class="n">percentage_f7f4ed</span><span class="p">,</span> <span class="n">percentage_737373</span><span class="p">]</span>
+
+        <span class="c1"># Add the first stacked bar (color #F7F4ED)</span>
+        <span class="n">stacked_bar_chart</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">percentage_f7f4ed</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">bar_width</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#F7F4ED&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="p">[</span><span class="n">categories</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">percentage</span><span class="o">=</span><span class="p">[</span><span class="n">percentages</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span>
+
+        <span class="c1"># Add the second stacked bar (color #737373)</span>
+        <span class="n">stacked_bar_chart</span><span class="o">.</span><span class="n">vbar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">percentage_f7f4ed</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">bar_width</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#737373&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="p">[</span><span class="n">categories</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">percentage</span><span class="o">=</span><span class="p">[</span><span class="n">percentages</span><span class="p">[</span><span class="mi">1</span><span class="p">]]))</span>
+
+        <span class="c1"># Set the x-axis ticker</span>
+        <span class="n">stacked_bar_chart</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">ticker</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">stacked_bar_chart</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_overrides</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;(%)&#39;</span><span class="p">}</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># LINKED BRUSHING (ACROSS BOTH HEATMAPS)</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="c1"># Change the size of the y-axis text</span>
+        <span class="n">stacked_bar_chart</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_label_text_font_size</span> <span class="o">=</span> <span class="s2">&quot;9px&quot;</span>
+
+        <span class="c1"># Add linked tools to both heatmaps</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">tools</span> <span class="o">=</span> <span class="p">[</span><span class="n">hover_tool</span><span class="p">,</span> <span class="n">SaveTool</span><span class="p">(),</span> <span class="n">ResetTool</span><span class="p">(),</span> <span class="n">WheelZoomTool</span><span class="p">(),</span> <span class="n">PanTool</span><span class="p">(),</span> <span class="n">BoxZoomTool</span><span class="p">()]</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">tools</span> <span class="o">=</span> <span class="p">[</span><span class="n">hover_tool_second</span><span class="p">,</span><span class="n">SaveTool</span><span class="p">(),</span> <span class="n">ResetTool</span><span class="p">(),</span> <span class="n">WheelZoomTool</span><span class="p">(),</span> <span class="n">PanTool</span><span class="p">(),</span> <span class="n">BoxZoomTool</span><span class="p">()]</span>
+
+        <span class="c1"># Add linked brushing to both heatmaps</span>
+        <span class="n">p_second_row</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">BoxSelectTool</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="s2">&quot;width&quot;</span><span class="p">))</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">BoxSelectTool</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="s2">&quot;width&quot;</span><span class="p">))</span>
+
+        <span class="c1"># --------------------------------------------------------------</span>
+        <span class="c1"># FINAL LAYOUT AND OUTPUT</span>
+        <span class="c1"># --------------------------------------------------------------</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">gridplot</span><span class="p">([[</span><span class="n">p</span><span class="p">,</span> <span class="n">bar_plot</span><span class="p">],</span> <span class="p">[</span><span class="n">p_second_row</span><span class="p">,</span> <span class="n">stacked_bar_chart</span><span class="p">]])</span>
+        <span class="n">output_file</span><span class="p">(</span><span class="n">filesave_name</span> <span class="o">+</span> <span class="s2">&quot;.html&quot;</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
