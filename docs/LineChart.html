@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LineChart – PMV and PPD &mdash; BEPVis Tool Documentation 1.00.00 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=795c39da"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Radar chart - Primary Energy Breakdown" href="Radar.html" />
+    <link rel="prev" title="Heatmap Visualization" href="Heatmap.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            BEPVis Tool Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">BEPVis Data Visualization Tool</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Data Visualizations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="GainsAndLosses.html">Bar chart - Gains &amp; Lossess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Heatmap.html">Heatmap Visualization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">LineChart – PMV and PPD</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-figures">Example Figures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Visualizations.LineChart.LineChart">LineChart Module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#line-charts-for-pmv-and-ppd">Line Charts for PMV and PPD</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualizations.LineChart.LineChart.Replace_FromDict"><code class="docutils literal notranslate"><span class="pre">Replace_FromDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Visualizations.LineChart.LineChart.lnchrt"><code class="docutils literal notranslate"><span class="pre">lnchrt</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-Visualizations.LineChart">Package contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Radar.html">Radar chart - Primary Energy Breakdown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ScatterPlot.html">Scatter Plot - Heating &amp; Cooling vs Outdoor Temperature</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ref.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">About the authors</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">BEPVis Tool Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Data Visualizations</a></li>
+      <li class="breadcrumb-item active">LineChart – PMV and PPD</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/LineChart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="linechart-pmv-and-ppd">
+<h1>LineChart – PMV and PPD<a class="headerlink" href="#linechart-pmv-and-ppd" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>This visualization displays the monthly <strong>thermal comfort indicators</strong>
+Predicted Mean Vote (PMV) and Predicted Percentage of Dissatisfied (PPD)
+computed from EnergyPlus simulations.
+It provides a clear temporal overview of comfort performance across spaces,
+highlighting periods of discomfort and helping evaluate HVAC operation,
+occupancy schedules, and microclimatic conditions.</p>
+</section>
+<section id="example-figures">
+<h2>Example Figures<a class="headerlink" href="#example-figures" title="Link to this heading"></a></h2>
+<img alt="Line chart visualization" class="align-center" src="_images/2.Line_PMV.jpg" />
+<img alt="Line chart visualization" class="align-center" src="_images/2.Line_PPD.jpg" />
+</section>
+<section id="module-Visualizations.LineChart.LineChart">
+<span id="linechart-module"></span><h2>LineChart Module<a class="headerlink" href="#module-Visualizations.LineChart.LineChart" title="Link to this heading"></a></h2>
+<section id="line-charts-for-pmv-and-ppd">
+<h3>Line Charts for PMV and PPD<a class="headerlink" href="#line-charts-for-pmv-and-ppd" title="Link to this heading"></a></h3>
+<p>This module implements the <code class="docutils literal notranslate"><span class="pre">lnchrt</span></code> class used in BEPVis to generate
+monthly PMV or PPD trend line charts for each space (People Object).</p>
+<section id="features">
+<h4>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Supports PMV and PPD monthly aggregated data</p></li>
+<li><p>Displays average, minimum, and maximum per zone</p></li>
+<li><p>Adds comfort annotations and recommended ranges (ISO / ASHRAE 55)</p></li>
+<li><p>Generates interactive HTML outputs with Bokeh</p></li>
+<li><p>Creates a clean legend, hover tool, and color-coded comfort bands</p></li>
+</ul>
+</section>
+<section id="input-format">
+<h4>Input Format<a class="headerlink" href="#input-format" title="Link to this heading"></a></h4>
+<p>The Excel sheet must contain the following columns:</p>
+<dl class="simple">
+<dt>For each <cite>nominal_people_object_name</cite>:</dt><dd><ul class="simple">
+<li><p>&lt;Name&gt;</p></li>
+<li><p>&lt;Name&gt;max</p></li>
+<li><p>&lt;Name&gt;min</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Month | Office1 | Office1max | Office1min | Office2 | …</p>
+<p>Authors: Ofelia Vera-Piazzini, Massimiliano Scarpa (Università Iuav di Venezia)
+License: MIT</p>
+</section>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="Visualizations.LineChart.LineChart.Replace_FromDict">
+<span class="sig-prename descclassname"><span class="pre">Visualizations.LineChart.LineChart.</span></span><span class="sig-name descname"><span class="pre">Replace_FromDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Visualizations/LineChart/LineChart.html#Replace_FromDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualizations.LineChart.LineChart.Replace_FromDict" title="Link to this definition"></a></dt>
+<dd><p>Replace multiple characters in a string using a mapping dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> (<em>str</em>) – Input string.</p></li>
+<li><p><strong>dict</strong> (<em>dict</em>) – Dictionary where key = old character, value = new character.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Cleaned string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="Visualizations.LineChart.LineChart.lnchrt">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">Visualizations.LineChart.LineChart.</span></span><span class="sig-name descname"><span class="pre">lnchrt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_file_pathandname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_nominal_people_object_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">html_file_pathandname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filesave_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'?'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Visualizations/LineChart/LineChart.html#lnchrt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Visualizations.LineChart.LineChart.lnchrt" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Generate PMV/PPD monthly line charts for all zones.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_file_pathandname</strong> (<em>str</em>) – Excel file containing PMV or PPD results.</p></li>
+<li><p><strong>s_nominal_people_object_name</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – List of People-Object names (spaces).</p></li>
+<li><p><strong>html_file_pathandname</strong> (<em>str</em>) – Optional output filename (deprecated, overwritten by filesave_name).</p></li>
+<li><p><strong>target</strong> (<em>str</em>) – ‘PMV’ or ‘PPD’.</p></li>
+<li><p><strong>filesave_name</strong> (<em>str</em>) – Output filename for the interactive HTML file.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The plot includes mean/min/max lines for each zone.</p></li>
+<li><p>Comfort ranges are displayed depending on PMV/PPD.</p></li>
+<li><p>Each zone gets a unique Glasbey color from <code class="docutils literal notranslate"><span class="pre">colorcet</span></code>.</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="module-Visualizations.LineChart">
+<span id="package-contents"></span><h2>Package contents<a class="headerlink" href="#module-Visualizations.LineChart" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Heatmap.html" class="btn btn-neutral float-left" title="Heatmap Visualization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Radar.html" class="btn btn-neutral float-right" title="Radar chart - Primary Energy Breakdown" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, O.Vera-Piazzini, M.Scarpa.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
