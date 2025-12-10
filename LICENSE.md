@@ -1,5 +1,7 @@
 # MIT License
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
+
 Copyright (c) [2025] [Ofelia Vera-Piazzini, Massimiliano Scarpa]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
