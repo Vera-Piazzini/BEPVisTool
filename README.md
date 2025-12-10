@@ -1,5 +1,7 @@
 # BEPVis Tool Documentation
 
+[![DOI](https://zenodo.org/badge/867164554.svg)](https://doi.org/10.5281/zenodo.17883831)
+
 Welcome to the **BEPVis** — Building Energy Performance Visualization Toolkit
 
 **BEPVis** is a modular post-processing and visualization framework designed to extract, organize, and visually explore results from **EnergyPlus** simulations. It automates all data preparation steps and generates high-quality interactive visualizations for energy analysis, comfort assessment, and thermal balance interpretation.
