@@ -40,3 +40,4 @@ html_context = {"github_url": "https://github.com", # o il tuo dominio
                 "github_version": "main", # o "master", a seconda del branch che usi per GH Pages
                 "conf_py_path": "/docs/" # o dove si trova il conf.py, se usi una sottocartella
 }
+html_baseurl = 'https://vera-piazzini.github.io/BEPVisTool/'
